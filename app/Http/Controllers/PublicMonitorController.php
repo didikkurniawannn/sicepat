@@ -13,9 +13,10 @@ class PublicMonitorController extends Controller
         $sections = Section::orderBy('order')->get()->map(function ($s) {
             $qq = Activity::where('section_id', $s->id);
             $s->activity_count = (clone $qq)->count();
-            $s->total_pagu = (clone $qq)->sum('budget_pagu');
-            $s->total_realisasi = (clone $qq)->sum('budget_realization');
-            $s->upcoming7 = (clone $qq)->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])->count();
+            $ss = Activity::budgetSums($qq);
+            $s->total_pagu = $ss['pagu'];
+            $s->total_realisasi = $ss['realisasi'];
+            $s->upcoming7 = Activity::where('section_id', $s->id)->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])->count();
             return $s;
         });
 

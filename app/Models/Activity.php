@@ -61,4 +61,18 @@ class Activity extends Model
     {
         return $q->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()]);
     }
+
+    /**
+     * Total pagu & realisasi dengan aturan: nilai yang SAMA pada kode rekening
+     * yang SAMA hanya dihitung 1x (tidak dijumlahkan berulang).
+     * $query adalah Eloquent builder yang sudah difilter (dicloning di dalam).
+     */
+    public static function budgetSums($query): array
+    {
+        $byRek = (clone $query)->get(['account_code', 'budget_pagu', 'budget_realization'])
+            ->groupBy('account_code');
+        $pagu = $byRek->map(fn($g) => $g->pluck('budget_pagu')->unique()->sum())->sum();
+        $real = $byRek->map(fn($g) => $g->pluck('budget_realization')->unique()->sum())->sum();
+        return ['pagu' => $pagu, 'realisasi' => $real, 'sisa' => $pagu - $real];
+    }
 }

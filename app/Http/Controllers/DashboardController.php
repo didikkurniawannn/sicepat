@@ -28,20 +28,22 @@ class DashboardController extends Controller
             ->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->count();
 
-        $pagu = (clone $q)->sum('budget_pagu');
-        $realisasi = (clone $q)->sum('budget_realization');
-        $sisa = $pagu - $realisasi;
+        $sums = Activity::budgetSums($q);
+        $pagu = $sums['pagu'];
+        $realisasi = $sums['realisasi'];
+        $sisa = $sums['sisa'];
 
         $perSection = Section::orderBy('order')->get()->map(function ($s) use ($user) {
             $qq = Activity::where('section_id', $s->id);
         if ($user->hasAnyRole(['kasi','staf'])) {
                 if ($s->id !== $user->section_id) return null;
             }
+            $ss = Activity::budgetSums($qq);
             return [
                 'section' => $s,
                 'count' => (clone $qq)->count(),
-                'pagu' => (clone $qq)->sum('budget_pagu'),
-                'realisasi' => (clone $qq)->sum('budget_realization'),
+                'pagu' => $ss['pagu'],
+                'realisasi' => $ss['realisasi'],
             ];
         })->filter()->values();
 

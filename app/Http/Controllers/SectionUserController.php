@@ -11,8 +11,9 @@ class SectionUserController extends Controller
     {
         $sections = Section::withCount('activities')->orderBy('order')->get();
         foreach ($sections as $s) {
-            $s->total_pagu = \App\Models\Activity::where('section_id', $s->id)->sum('budget_pagu');
-            $s->total_realisasi = \App\Models\Activity::where('section_id', $s->id)->sum('budget_realization');
+            $ss = \App\Models\Activity::budgetSums(\App\Models\Activity::where('section_id', $s->id));
+            $s->total_pagu = $ss['pagu'];
+            $s->total_realisasi = $ss['realisasi'];
         }
         return view('sections.index', compact('sections'));
     }
@@ -20,10 +21,11 @@ class SectionUserController extends Controller
     public function sectionShow(Section $section)
     {
         $activities = $section->activities()->with('pptk')->orderBy('activity_date')->paginate(15);
+        $ss = \App\Models\Activity::budgetSums($section->activities());
         $stats = [
             'count' => $section->activities()->count(),
-            'pagu' => $section->activities()->sum('budget_pagu'),
-            'realisasi' => $section->activities()->sum('budget_realization'),
+            'pagu' => $ss['pagu'],
+            'realisasi' => $ss['realisasi'],
         ];
         $stats['sisa'] = $stats['pagu'] - $stats['realisasi'];
         return view('sections.show', compact('section','activities','stats'));
