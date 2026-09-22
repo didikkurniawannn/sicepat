@@ -41,10 +41,11 @@
 </div>
 <div class="bg-white rounded shadow overflow-x-auto">
 <table class="w-full text-sm">
-<thead class="bg-slate-100"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran</th><th class="p-2">Status</th></tr></thead>
+<thead class="bg-slate-100"><tr><th class="p-2 text-center">No</th><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran</th><th class="p-2">Status</th></tr></thead>
 <tbody>
 @foreach($activities as $a)
 <tr class="border-t hover:bg-slate-50">
+  <td class="p-2 text-center">{{ $activities->firstItem() + $loop->index }}</td>
   <td class="p-2 whitespace-nowrap">{{ $a->activity_date->translatedFormat('d F Y') }} @if($a->is_h7)<span class="text-xs bg-red-600 text-white px-1 rounded">H-{{ $a->days_to_event }}</span>@endif</td>
   <td class="p-2"><span class="text-xs px-1 rounded text-white" style="background:{{ $a->section->color }}">{{ $a->section->short_name }}</span></td>
   <td class="p-2"><a href="/kegiatan/{{ $a->id }}" class="text-blue-700 hover:underline font-medium">{{ $a->title }}</a><br><span class="text-xs text-slate-500">{{ $a->account_code }} · {{ \Str::limit($a->program_name,60) }}</span></td>
@@ -59,7 +60,7 @@
 @endforeach
 </tbody>
 <tfoot class="bg-slate-50 font-semibold">
-<tr class="border-t"><td colspan="3" class="p-2 text-right">Total halaman ini:</td><td class="p-2 text-right">{{ number_format($activities->sum('requirement_qty'),0,',','.') }}</td><td class="p-2 text-right">{{ number_format($activities->sum('total_qty'),0,',','.') }}</td><td colspan="5"></td></tr>
+<tr class="border-t"><td colspan="4" class="p-2 text-right">Total halaman ini:</td><td class="p-2 text-right">{{ number_format($activities->sum('requirement_qty'),0,',','.') }}</td><td class="p-2 text-right">{{ number_format($activities->sum('total_qty'),0,',','.') }}</td><td colspan="5"></td></tr>
 </tfoot>
 </table>
 </div>
