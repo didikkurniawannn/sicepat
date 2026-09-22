@@ -50,6 +50,16 @@
   <pre class="bg-slate-900 text-green-300 text-xs rounded p-3 overflow-x-auto whitespace-pre-wrap">{{ $runLog }}</pre>
   @endif
 
+  <div class="mt-4 bg-blue-50 border border-blue-300 rounded p-3 text-sm">
+    <p class="font-bold mb-1">3. Update production (migrasi aman — tanpa hapus data)</p>
+    <p class="text-xs text-slate-600 mb-2">Untuk server yang <strong>sudah berjalan & berisi data</strong>: hanya menjalankan migrasi yang belum jalan (mis. penggabungan role). Data kegiatan, user, dan dokumen <strong>tidak dihapus</strong>.</p>
+    <form method="POST" action="/install/migrate?token={{ $token }}">
+      @csrf
+      <input type="hidden" name="token" value="{{ $token }}">
+      <button @disabled(!$allOk) class="w-full bg-blue-700 text-white py-2 rounded font-semibold disabled:opacity-40">🔄 Jalankan Migrasi Aman (Update)</button>
+    </form>
+  </div>
+
   <p class="text-xs text-slate-400 mt-4">Demi keamanan, installer otomatis nonaktif setelah instalasi berhasil. Untuk mengaktifkan lagi, set <code>INSTALLER_ENABLED=true</code> di file .env.</p>
 
   <div class="mt-4 bg-slate-50 border rounded p-3 text-xs text-slate-600">

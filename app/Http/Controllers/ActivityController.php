@@ -18,7 +18,7 @@ class ActivityController extends Controller
         $user = auth()->user();
         $q = Activity::with(['section','pptk'])->orderBy('activity_date');
 
-        if ($user->hasAnyRole(['kasi','pptk','staf']) && $user->section_id) {
+        if ($user->hasAnyRole(['kasi','staf']) && $user->section_id) {
             $q->where('section_id', $user->section_id);
         }
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
@@ -46,7 +46,7 @@ class ActivityController extends Controller
     {
         $this->authorizeInput();
         $sections = Section::orderBy('order')->get();
-        $pptks = User::role('pptk')->with('section')->get();
+        $pptks = User::role('kasi')->with('section')->get();
         return view('activities.form', ['activity' => new Activity(), 'sections' => $sections, 'pptks' => $pptks]);
     }
 
@@ -71,7 +71,7 @@ class ActivityController extends Controller
     {
         $this->authorizeInput($activity);
         $sections = Section::orderBy('order')->get();
-        $pptks = User::role('pptk')->with('section')->get();
+        $pptks = User::role('kasi')->with('section')->get();
         return view('activities.form', ['activity' => $activity, 'sections' => $sections, 'pptks' => $pptks]);
     }
 
@@ -97,7 +97,7 @@ class ActivityController extends Controller
     {
         $activity->update(['status' => 'diajukan']);
         Verification::create(['activity_id' => $activity->id, 'user_id' => auth()->id(), 'role_at_time' => auth()->user()->getRoleNames()->first() ?? '-', 'decision' => 'diajukan', 'note' => 'Diajukan untuk verifikasi']);
-        $this->notifyRole('verifikator', 'Pengajuan baru perlu diverifikasi', $activity->title, $activity->id);
+        $this->notifyRole('admin', 'Pengajuan baru perlu diverifikasi', $activity->title, $activity->id);
         return back()->with('success', 'Kegiatan diajukan untuk verifikasi.');
     }
 

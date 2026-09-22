@@ -18,6 +18,7 @@ Route::get('/api/pantau/events', [PublicMonitorController::class, 'events']);
 // Installer (diproteksi token, otomatis nonaktif setelah sukses)
 Route::get('/install', [InstallerController::class, 'index']);
 Route::post('/install', [InstallerController::class, 'run']);
+Route::post('/install/migrate', [InstallerController::class, 'migrateUp']);
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');

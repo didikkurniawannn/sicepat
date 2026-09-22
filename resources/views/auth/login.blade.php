@@ -16,11 +16,9 @@
   <div class="mt-6 text-xs bg-slate-50 border rounded p-3">
     <p class="font-semibold mb-1">Akun demo (password: password123)</p>
     <ul class="space-y-0.5 text-slate-600">
-      <li>Admin: admin@sicepatkeg.local</li>
-      <li>Pimpinan: pimpinan@sicepatkeg.local</li>
-      <li>Verifikator: verifikator@sicepatkeg.local</li>
-      <li>Kasi: spr.kasi@sicepatkeg.local (spr/spb/ssb/spm/skt/tmv/sbu)</li>
-      <li>PPTK: spr.pptk@sicepatkeg.local (idem)</li>
+      <li>Admin (verifikasi + pimpinan): admin@sicepatkeg.local</li>
+      <li>Kasi (merangkap PPTK): spr.kasi@sicepatkeg.local (spr/spb/ssb/spm/skt/tmv/sbu)</li>
+      <li>Staf: staf@sicepatkeg.local</li>
     </ul>
   </div>
 </div>

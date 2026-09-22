@@ -126,6 +126,44 @@ class InstallerController extends Controller
         ]);
     }
 
+    /**
+     * Migrasi inkremental yang AMAN untuk production (tanpa terminal):
+     * hanya menjalankan migrasi yang belum pernah jalan (mis. penggabungan role),
+     * TIDAK menghapus data. Dipakai saat update aplikasi di server production.
+     */
+    public function migrateUp(Request $request)
+    {
+        $token = $this->guard($request);
+        $paths = $this->serverPaths();
+        $log = [];
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+            $log[] = Artisan::output();
+            try {
+                Artisan::call('optimize:clear');
+                $log[] = 'Cache dibersihkan.';
+            } catch (\Throwable $e) {
+                $log[] = 'optimize:clear dilewati: '.$e->getMessage();
+            }
+            $installed = $this->installed();
+            $this->setEnv('INSTALLER_ENABLED', 'false');
+            $log[] = 'Installer otomatis dinonaktifkan (INSTALLER_ENABLED=false).';
+            $runSuccess = true;
+        } catch (\Throwable $e) {
+            return view('install.index', [
+                'checks' => $this->checks(), 'allOk' => true,
+                'installed' => $this->installed(), 'token' => $token, 'paths' => $paths,
+                'runError' => 'Migrasi gagal: '.$e->getMessage(), 'runLog' => implode("\n", $log),
+            ]);
+        }
+
+        return view('install.index', [
+            'checks' => $this->checks(), 'allOk' => true,
+            'installed' => $installed, 'token' => $token, 'paths' => $paths,
+            'runSuccess' => $runSuccess, 'runLog' => implode("\n", $log),
+        ]);
+    }
+
     private function setEnv(string $key, string $value): void
     {
         $path = base_path('.env');

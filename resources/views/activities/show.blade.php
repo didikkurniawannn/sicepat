@@ -2,7 +2,7 @@
 @section('title', $activity->title)
 @section('content')
 <div class="flex items-center justify-between mb-3">
-  <h1 class="text-xl font-bold">{{ $activity->title }} @if($activity->is_h7)<span class="text-sm bg-red-600 text-white px-2 py-0.5 rounded">⚠ H-{{ $activity->days_to_event }} perlu persiapan PPTK</span>@endif</h1>
+  <h1 class="text-xl font-bold">{{ $activity->title }} @if($activity->is_h7)<span class="text-sm bg-red-600 text-white px-2 py-0.5 rounded">⚠ H-{{ $activity->days_to_event }} perlu persiapan Kasi</span>@endif</h1>
   <div class="flex gap-2 text-sm">
     @if(auth()->user()->hasAnyRole(['admin','kasi']))<a href="/kegiatan/{{ $activity->id }}/edit" class="bg-blue-600 text-white px-3 py-1 rounded">Edit</a>@endif
     <a href="/kegiatan" class="bg-slate-200 px-3 py-1 rounded">Kembali</a>
@@ -22,7 +22,7 @@
       <tr class="border-t"><td class="py-1 text-slate-500">Pagu</td><td>Rp {{ number_format($activity->budget_pagu,0,',','.') }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Realisasi ({{ $activity->realization_percent }}%)</td><td>Rp {{ number_format($activity->budget_realization,0,',','.') }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Sisa (auto)</td><td class="font-bold">Rp {{ number_format($activity->budget_remaining,0,',','.') }}</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">PPTK / Lokasi</td><td>{{ $activity->pptk->name ?? '-' }} / {{ $activity->location ?? '-' }}</td></tr>
+      <tr class="border-t"><td class="py-1 text-slate-500">Penanggung Jawab / Lokasi</td><td>{{ $activity->pptk->name ?? '-' }} / {{ $activity->location ?? '-' }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Status / Progress</td><td><span class="bg-slate-200 px-2 rounded text-xs">{{ $activity->status }}</span> · {{ $activity->progress }}%</td></tr>
     </table>
     <div class="mt-2 bg-slate-100 rounded h-2"><div class="bg-green-600 h-2 rounded" style="width:{{ $activity->progress }}%"></div></div>
@@ -55,14 +55,14 @@
 
 <div class="space-y-4">
   <div class="bg-white rounded shadow p-4 text-sm">
-    <h2 class="font-bold mb-2">Update Progress & Realisasi (PPTK)</h2>
+    <h2 class="font-bold mb-2">Update Progress & Realisasi (Kasi)</h2>
     <form action="/kegiatan/{{ $activity->id }}/progress" method="POST" class="space-y-2">@csrf
       <div><label>Progress %</label><input type="number" name="progress" min="0" max="100" value="{{ $activity->progress }}" class="w-full border rounded px-2 py-1"></div>
       <div><label>Realisasi (Rp)</label><input type="number" name="budget_realization" value="{{ $activity->budget_realization }}" class="w-full border rounded px-2 py-1"></div>
       <button class="bg-green-600 text-white px-3 py-1 rounded w-full">Simpan Progress</button>
     </form>
   </div>
-  @if(auth()->user()->hasAnyRole(['admin','verifikator','pimpinan']))
+  @if(auth()->user()->hasRole('admin'))
   <div class="bg-white rounded shadow p-4 text-sm">
     <h2 class="font-bold mb-2">Keputusan Verifikasi</h2>
     <form action="/verifikasi/{{ $activity->id }}" method="POST" class="space-y-2">@csrf

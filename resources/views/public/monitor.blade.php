@@ -113,7 +113,7 @@ function modalHtml(p) {
       <tr class="border-t"><td class="py-1 text-slate-500">Realisasi</td><td>${fmt(p.realisasi)}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Sisa</td><td class="font-bold">${fmt(p.sisa)}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Status / Progress</td><td>${p.status} · ${p.progress}%</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">Lokasi / PPTK</td><td>${p.lokasi} / ${p.pptk}</td></tr>
+      <tr class="border-t"><td class="py-1 text-slate-500">Lokasi / Penanggung Jawab</td><td>${p.lokasi} / ${p.pptk}</td></tr>
     </table>`;
 }
 

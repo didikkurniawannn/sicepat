@@ -41,7 +41,7 @@ class SectionUserController extends Controller
         abort_unless(auth()->user()->hasRole('admin'), 403);
         $data = $request->validate([
             'name' => 'required|string|max:255', 'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8', 'role' => 'required|in:admin,kasi,pptk,staf,verifikator,pimpinan',
+            'password' => 'required|min:8', 'role' => 'required|in:admin,kasi,staf',
             'section_id' => 'required|exists:sections,id',
         ]);
         $u = \App\Models\User::create([

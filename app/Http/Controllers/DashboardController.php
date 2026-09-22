@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $q = Activity::with('section');
 
         // Kasi/PPTK/Staf hanya lihat unit sendiri, lainnya global
-        if ($user->hasAnyRole(['kasi','pptk','staf'])) {
+            if ($user->hasAnyRole(['kasi','staf'])) {
             $q->where('section_id', $user->section_id);
         }
 
@@ -24,7 +24,7 @@ class DashboardController extends Controller
         $selesai = $all->where('status', 'selesai')->count();
         $ditolak = $all->where('status', 'ditolak')->count();
         $h7 = Activity::with('section')
-            ->when($user->hasAnyRole(['kasi','pptk','staf']), fn($qq) => $qq->where('section_id', $user->section_id))
+            ->when($user->hasAnyRole(['kasi','staf']), fn($qq) => $qq->where('section_id', $user->section_id))
             ->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->count();
 
@@ -34,7 +34,7 @@ class DashboardController extends Controller
 
         $perSection = Section::orderBy('order')->get()->map(function ($s) use ($user) {
             $qq = Activity::where('section_id', $s->id);
-            if ($user->hasAnyRole(['kasi','pptk','staf'])) {
+        if ($user->hasAnyRole(['kasi','staf'])) {
                 if ($s->id !== $user->section_id) return null;
             }
             return [

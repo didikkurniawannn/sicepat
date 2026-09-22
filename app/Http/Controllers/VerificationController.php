@@ -13,7 +13,7 @@ class VerificationController extends Controller
 {
     public function index()
     {
-        abort_unless(auth()->user()->hasAnyRole(['admin','verifikator','pimpinan']), 403);
+        abort_unless(auth()->user()->hasRole('admin'), 403);
         $queue = Activity::with(['section','pptk'])->whereIn('status', ['diajukan','diverifikasi'])->orderBy('activity_date')->paginate(15);
         $history = Verification::with(['activity.section','user'])->latest()->paginate(15);
         return view('verifications.index', compact('queue','history'));
@@ -21,7 +21,7 @@ class VerificationController extends Controller
 
     public function decide(Request $request, Activity $activity)
     {
-        abort_unless(auth()->user()->hasAnyRole(['admin','verifikator','pimpinan']), 403);
+        abort_unless(auth()->user()->hasRole('admin'), 403);
         $request->validate(['decision' => 'required|in:diverifikasi,disetujui,ditolak,revisi', 'note' => 'nullable|string']);
         $user = auth()->user();
 

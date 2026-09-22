@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             Section::updateOrCreate(['code' => $s['code']], $s);
         }
 
-        foreach (['admin','kasi','pptk','staf','verifikator','pimpinan'] as $r) {
+        foreach (['admin', 'kasi', 'staf'] as $r) {
             Role::findOrCreate($r);
         }
 
@@ -45,12 +45,11 @@ class DatabaseSeeder extends Seeder
         };
 
         $admin = $mkUser('Administrator', 'admin@sicepatkeg.local', 'admin', 'SBU');
-        $mkUser('Pimpinan Kecamatan', 'pimpinan@sicepatkeg.local', 'pimpinan', 'SBU');
-        $mkUser('Verifikator', 'verifikator@sicepatkeg.local', 'verifikator', 'SBU');
+        $mkUser('Staf Umum', 'staf@sicepatkeg.local', 'staf', 'SBU');
 
         foreach ($secByCode as $code => $sec) {
+            // Kasi merangkap tugas PPTK (persiapan H-7 & update progress)
             $mkUser('Kasi '.$sec->short_name.' ('.$code.')', strtolower($code).'.kasi@sicepatkeg.local', 'kasi', $code);
-            $mkUser('PPTK '.$sec->short_name.' ('.$code.')', strtolower($code).'.pptk@sicepatkeg.local', 'pptk', $code);
         }
 
         // Seed activities dari Data Kegiatan.xlsx
@@ -62,7 +61,7 @@ class DatabaseSeeder extends Seeder
         foreach ($rows as $row) {
             $section = $secByName[$row['section']] ?? null;
             if (!$section) continue;
-            $pptk = User::role('pptk')->where('section_id', $section->id)->first();
+            $pptk = User::role('kasi')->where('section_id', $section->id)->first();
             $date = \Carbon\Carbon::parse($row['activity_date']);
             // Status heuristik: realisasi>0 & tanggal lewat => selesai/berjalan, else draft
             if (($row['budget_realization'] ?? 0) > 0) {

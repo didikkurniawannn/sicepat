@@ -17,7 +17,9 @@
     <a href="/pantau" target="_blank" title="Halaman pantauan publik (tanpa login)" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded hover:bg-yellow-300">📊 Pantau</a>
     <a href="/kegiatan" class="hover:text-yellow-300">Kegiatan</a>
     <a href="/kalender" class="hover:text-yellow-300">Kalender</a>
+    @role('admin')
     <a href="/verifikasi" class="hover:text-yellow-300">Verifikasi</a>
+    @endrole
     <a href="/laporan" class="hover:text-yellow-300">Laporan</a>
     <a href="/unit-kerja" class="hover:text-yellow-300">Unit Kerja</a>
     @role('admin')
@@ -33,7 +35,8 @@
 </nav>
 <div class="md:hidden bg-slate-800 text-white text-xs flex gap-3 px-4 py-2 overflow-x-auto">
   <a href="/dashboard">Dashboard</a><a href="/pantau" target="_blank" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded">📊 Pantau</a><a href="/kegiatan">Kegiatan</a><a href="/kalender">Kalender</a>
-  <a href="/verifikasi">Verifikasi</a><a href="/laporan">Laporan</a><a href="/unit-kerja">Unit</a>
+  @role('admin')<a href="/verifikasi">Verifikasi</a>@endrole
+  <a href="/laporan">Laporan</a><a href="/unit-kerja">Unit</a>
   @role('admin')<a href="/import">Import</a><a href="/pengguna">User</a>@endrole
   <a href="/notifikasi">Notifikasi</a>
 </div>

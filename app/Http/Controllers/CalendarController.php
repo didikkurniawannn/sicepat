@@ -18,7 +18,7 @@ class CalendarController extends Controller
     {
         $user = auth()->user();
         $q = Activity::with('section');
-        if ($user->hasAnyRole(['kasi','pptk','staf']) && $user->section_id) {
+        if ($user->hasAnyRole(['kasi','staf']) && $user->section_id) {
             $q->where('section_id', $user->section_id);
         }
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
