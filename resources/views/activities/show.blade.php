@@ -5,6 +5,12 @@
   <h1 class="text-xl font-bold">{{ $activity->title }} @if($activity->is_h7)<span class="text-sm bg-red-600 text-white px-2 py-0.5 rounded">⚠ H-{{ $activity->days_to_event }} perlu persiapan Kasi</span>@endif</h1>
   <div class="flex gap-2 text-sm">
     @if(auth()->user()->hasAnyRole(['admin','kasi']))<a href="/kegiatan/{{ $activity->id }}/edit" class="bg-blue-600 text-white px-3 py-1 rounded">Edit</a>@endif
+    @if(auth()->user()->hasAnyRole(['admin','kasi']))
+    <form action="/kegiatan/{{ $activity->id }}" method="POST" onsubmit="return confirm('Hapus kegiatan {{ addslashes($activity->title) }} beserta dokumen & riwayat verifikasinya? Tindakan ini tidak bisa dibatalkan.')">
+      @csrf @method('DELETE')
+      <button class="bg-red-600 text-white px-3 py-1 rounded">Hapus</button>
+    </form>
+    @endif
     <a href="/kegiatan" class="bg-slate-200 px-3 py-1 rounded">Kembali</a>
   </div>
 </div>

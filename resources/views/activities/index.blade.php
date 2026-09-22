@@ -41,7 +41,7 @@
 </div>
 <div class="bg-white rounded shadow overflow-x-auto">
 <table class="w-full text-sm">
-<thead class="bg-slate-100"><tr><th class="p-2 text-center">No</th><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran</th><th class="p-2">Status</th></tr></thead>
+<thead class="bg-slate-100"><tr><th class="p-2 text-center">No</th><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran</th><th class="p-2">Status</th>@if(auth()->user()->hasAnyRole(['admin','kasi']))<th class="p-2">Aksi</th>@endif</tr></thead>
 <tbody>
 @foreach($activities as $a)
 <tr class="border-t hover:bg-slate-50">
@@ -56,11 +56,19 @@
   <td class="p-2 text-right">{{ number_format($a->budget_realization,0,',','.') }}</td>
   <td class="p-2 text-right font-semibold">{{ number_format($a->budget_remaining,0,',','.') }}</td>
   <td class="p-2 text-center"><span class="text-xs bg-slate-200 px-2 py-0.5 rounded">{{ $a->status }}</span></td>
+  @if(auth()->user()->hasAnyRole(['admin','kasi']))
+  <td class="p-2 text-center whitespace-nowrap">
+    <form action="/kegiatan/{{ $a->id }}" method="POST" class="inline" onsubmit="return confirm('Hapus kegiatan ini beserta dokumen & riwayat verifikasinya?')">
+      @csrf @method('DELETE')
+      <button class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded hover:bg-red-600 hover:text-white">Hapus</button>
+    </form>
+  </td>
+  @endif
 </tr>
 @endforeach
 </tbody>
 <tfoot class="bg-slate-50 font-semibold">
-<tr class="border-t"><td colspan="4" class="p-2 text-right">Total halaman ini:</td><td class="p-2 text-right">{{ number_format($activities->sum('requirement_qty'),0,',','.') }}</td><td class="p-2 text-right">{{ number_format($activities->sum('total_qty'),0,',','.') }}</td><td colspan="5"></td></tr>
+<tr class="border-t"><td colspan="4" class="p-2 text-right">Total halaman ini:</td><td class="p-2 text-right">{{ number_format($activities->sum('requirement_qty'),0,',','.') }}</td><td class="p-2 text-right">{{ number_format($activities->sum('total_qty'),0,',','.') }}</td><td colspan="{{ auth()->user()->hasAnyRole(['admin','kasi']) ? 6 : 5 }}"></td></tr>
 </tfoot>
 </table>
 </div>
