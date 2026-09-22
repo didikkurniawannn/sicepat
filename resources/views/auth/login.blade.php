@@ -14,11 +14,17 @@
   </form>
   <a href="/pantau" class="block text-center text-sm text-blue-700 hover:underline mt-3">📊 Lihat Pantauan Kegiatan (tanpa login)</a>
   <div class="mt-6 text-xs bg-slate-50 border rounded p-3">
-    <p class="font-semibold mb-1">Akun demo (password: password123)</p>
-    <ul class="space-y-0.5 text-slate-600">
-      <li>Admin (verifikasi + pimpinan): admin@sicepatkeg.local</li>
-      <li>Kasi (merangkap PPTK): spr.kasi@sicepatkeg.local (spr/spb/ssb/spm/skt/tmv/sbu)</li>
-      <li>Staf: staf@sicepatkeg.local</li>
+    <p class="font-semibold mb-1">💡 Cara masuk: ketik email sesuai nama & unit kerja Anda + password <code class="bg-slate-200 px-1 rounded">password123</code></p>
+    <ul class="space-y-1 text-slate-600 mt-2">
+      @foreach($adminUsers as $a)
+      <li><span class="font-semibold text-slate-800">👑 {{ $a->name }}</span><br><span class="font-mono">{{ $a->email }}</span></li>
+      @endforeach
+      @foreach($kasiUsers as $k)
+      <li><span class="font-semibold text-slate-800">📋 {{ $k->name }}{{ $k->section ? ' — '.$k->section->name : '' }}</span><br><span class="font-mono">{{ $k->email }}</span></li>
+      @endforeach
+      @foreach($stafUsers as $s)
+      <li><span class="font-semibold text-slate-800">🧑‍💼 {{ $s->name }}</span><br><span class="font-mono">{{ $s->email }}</span></li>
+      @endforeach
     </ul>
   </div>
 </div>

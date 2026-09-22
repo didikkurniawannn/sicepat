@@ -8,7 +8,20 @@ use App\Models\ActivityLog;
 
 class AuthController extends Controller
 {
-    public function showLogin() { return view('auth.login'); }
+    public function showLogin()
+    {
+        // Daftar akun login per peran agar tiap user langsung tahu emailnya (dinamis dari database)
+        try {
+            $adminUsers = \App\Models\User::role('admin')->get();
+            $kasiUsers = \App\Models\User::role('kasi')->with('section')->get()
+                ->sortBy(fn($u) => $u->section->order ?? 99)->values();
+            $stafUsers = \App\Models\User::role('staf')->with('section')->get()
+                ->sortBy(fn($u) => $u->section->order ?? 99)->values();
+        } catch (\Throwable $e) {
+            $adminUsers = $kasiUsers = $stafUsers = collect();
+        }
+        return view('auth.login', compact('adminUsers', 'kasiUsers', 'stafUsers'));
+    }
 
     public function login(Request $request)
     {
