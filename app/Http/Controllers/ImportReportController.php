@@ -60,19 +60,21 @@ class ImportReportController extends Controller
         if ($request->filled('year')) $q->whereYear('activity_date', $request->year);
         // Catatan: rekap dihitung SEBELUM paginate karena paginate() menempelkan limit/offset ke query builder
         $sections = \App\Models\Section::orderBy('order')->get();
+        // Pagu & realisasi direkap per kode rekening TANPA menjumlahkan nilai yang sama
+        // (nilai yang tertera berulang di banyak baris dihitung 1x); kebutuhan dijumlahkan.
+        $perRekening = (clone $q)->get()->groupBy('account_code')->map(fn($g) => [
+            'code' => $g->first()->account_code, 'count' => $g->count(),
+            'pagu' => $g->pluck('budget_pagu')->unique()->sum(),
+            'realisasi' => $g->pluck('budget_realization')->unique()->sum(),
+            'kebutuhan' => $g->sum('requirement_qty'),
+        ])->values();
         $summary = [
-            'pagu' => (clone $q)->sum('budget_pagu'),
-            'realisasi' => (clone $q)->sum('budget_realization'),
-            'kebutuhan' => (clone $q)->sum('requirement_qty'),
-            'jumlah' => (clone $q)->sum('total_qty'),
+            'pagu' => $perRekening->sum('pagu'),
+            'realisasi' => $perRekening->sum('realisasi'),
+            'kebutuhan' => $perRekening->sum('kebutuhan'),
         ];
         $summary['sisa'] = $summary['pagu'] - $summary['realisasi'];
         $summary['pct'] = $summary['pagu'] > 0 ? round($summary['realisasi'] / $summary['pagu'] * 100, 1) : 0;
-        $perRekening = (clone $q)->get()->groupBy('account_code')->map(fn($g) => [
-            'code' => $g->first()->account_code, 'count' => $g->count(),
-            'pagu' => $g->sum('budget_pagu'), 'realisasi' => $g->sum('budget_realization'),
-            'kebutuhan' => $g->sum('requirement_qty'), 'jumlah' => $g->sum('total_qty'),
-        ])->values();
         $activities = $q->orderBy('activity_date')->paginate(20)->withQueryString();
         return view('reports.index', compact('activities','sections','summary','perRekening'));
     }
