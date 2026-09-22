@@ -90,7 +90,17 @@ class ImportReportController extends Controller
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
         if ($request->filled('status')) $q->where('status', $request->status);
         $activities = $q->get();
-        $pdf = Pdf::loadView('reports.pdf', compact('activities'))->setPaper('a4', 'landscape');
+        // Tanda warna untuk kode rekening yang muncul > 1x (palet sama dengan export Excel)
+        $palette = ActivitiesExport::cssPalette();
+        $dupColors = [];
+        $i = 0;
+        foreach ($activities->groupBy('account_code') as $code => $g) {
+            if ($g->count() > 1) {
+                $dupColors[$code] = $palette[$i % count($palette)];
+                $i++;
+            }
+        }
+        $pdf = Pdf::loadView('reports.pdf', compact('activities', 'dupColors'))->setPaper('a4', 'landscape');
         return $pdf->download('laporan-kegiatan.pdf');
     }
 }
