@@ -32,13 +32,13 @@
 
 <div class="grid md:grid-cols-3 gap-4">
   <div class="bg-white rounded shadow p-4"><h3 class="font-semibold mb-2">Upcoming 30 Hari</h3>
-    <ul class="text-sm space-y-2">@forelse($upcoming as $a)<li><a class="text-blue-700 hover:underline" href="/kegiatan/{{ $a->id }}">{{ $a->activity_date->format('d M Y') }} — {{ $a->title }}</a> <span class="text-xs text-slate-500">({{ $a->section->short_name }})</span>@if($a->is_h7)<span class="text-xs bg-red-100 text-red-700 px-1 rounded">H-{{ $a->days_to_event }}</span>@endif</li>@empty<li class="text-slate-500">Tidak ada.</li>@endforelse</ul>
+    <ul class="text-sm space-y-2">@forelse($upcoming as $a)<li><a class="text-blue-700 hover:underline" href="/kegiatan/{{ $a->id }}">{{ $a->activity_date->translatedFormat('d F Y') }} — {{ $a->title }}</a> <span class="text-xs text-slate-500">({{ $a->section->short_name }})</span>@if($a->is_h7)<span class="text-xs bg-red-100 text-red-700 px-1 rounded">H-{{ $a->days_to_event }}</span>@endif</li>@empty<li class="text-slate-500">Tidak ada.</li>@endforelse</ul>
   </div>
   <div class="bg-white rounded shadow p-4"><h3 class="font-semibold mb-2">Top 5 Pagu Terbesar</h3>
     <ul class="text-sm space-y-2">@foreach($top5 as $a)<li><a class="text-blue-700 hover:underline" href="/kegiatan/{{ $a->id }}">{{ $a->title }}</a><br><span class="text-xs text-slate-500">Rp {{ number_format($a->budget_pagu,0,',','.') }} · {{ $a->section->short_name }}</span></li>@endforeach</ul>
   </div>
   <div class="bg-white rounded shadow p-4"><h3 class="font-semibold mb-2">Belum Ada Realisasi (Rp 0)</h3>
-    <ul class="text-sm space-y-2">@foreach($zeroRealisasi as $a)<li><a class="text-blue-700 hover:underline" href="/kegiatan/{{ $a->id }}">{{ $a->activity_date->format('d M') }} — {{ $a->title }}</a></li>@endforeach</ul>
+    <ul class="text-sm space-y-2">@foreach($zeroRealisasi as $a)<li><a class="text-blue-700 hover:underline" href="/kegiatan/{{ $a->id }}">{{ $a->activity_date->translatedFormat('d F') }} — {{ $a->title }}</a></li>@endforeach</ul>
   </div>
 </div>
 @endsection

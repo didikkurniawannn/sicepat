@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Semua tanggal tampil dalam Bahasa Indonesia (mis. "23 September 2026")
+        \Carbon\Carbon::setLocale('id');
     }
 }

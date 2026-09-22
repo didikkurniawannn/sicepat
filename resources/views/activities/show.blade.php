@@ -14,7 +14,7 @@
   <div class="bg-white rounded shadow p-4 text-sm">
     <h2 class="font-bold mb-2">Informasi Kegiatan (sesuai struktur Excel)</h2>
     <table class="w-full">
-      <tr class="border-t"><td class="py-1 text-slate-500 w-40">Tanggal/Bulan</td><td class="font-medium">{{ $activity->activity_date->format('Y-m-d') }}</td></tr>
+      <tr class="border-t"><td class="py-1 text-slate-500 w-40">Tanggal/Bulan</td><td class="font-medium">{{ $activity->activity_date->translatedFormat('l, d F Y') }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Bidang</td><td><span class="px-1 rounded text-white text-xs" style="background:{{ $activity->section->color }}">{{ $activity->section->name }}</span></td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Kode Rekening</td><td class="font-mono">{{ $activity->account_code }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Kegiatan/Program</td><td>{{ $activity->program_name }}</td></tr>

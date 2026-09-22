@@ -17,7 +17,7 @@
 <header class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
   <div>
     <span class="font-bold text-lg">⚡ SiCepatKeg</span>
-    <span class="text-xs text-slate-300 ml-2">Pantauan Kegiatan — tanpa login · data per {{ now()->format('d M Y H:i') }} WIB · refresh otomatis 5 menit</span>
+    <span class="text-xs text-slate-300 ml-2">Pantauan Kegiatan — tanpa login · data per {{ now()->translatedFormat('d F Y H:i') }} WIB · refresh otomatis 5 menit</span>
   </div>
   <a href="/login" class="bg-yellow-400 text-slate-900 text-sm font-semibold px-3 py-1 rounded">Login Petugas</a>
 </header>
@@ -37,7 +37,7 @@
       <ul class="text-sm space-y-2 max-h-[520px] overflow-y-auto">
         @forelse($upcoming7 as $a)
         <li class="border-l-4 pl-2" style="border-color:{{ $a->section->color }}">
-          <span class="font-semibold">{{ $a->activity_date->format('d M Y') }}</span>
+          <span class="font-semibold">{{ $a->activity_date->translatedFormat('d F Y') }}</span>
           @if($a->is_h7)<span class="text-xs bg-red-600 text-white px-1 rounded">H-{{ $a->days_to_event }}</span>@endif
           <br>{{ $a->title }}
           <br><span class="text-xs text-slate-500">{{ $a->section->name }} · {{ $a->status }} · Rp {{ number_format($a->budget_pagu,0,',','.') }}</span>

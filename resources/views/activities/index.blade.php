@@ -45,7 +45,7 @@
 <tbody>
 @foreach($activities as $a)
 <tr class="border-t hover:bg-slate-50">
-  <td class="p-2 whitespace-nowrap">{{ $a->activity_date->format('Y-m-d') }} @if($a->is_h7)<span class="text-xs bg-red-600 text-white px-1 rounded">H-{{ $a->days_to_event }}</span>@endif</td>
+  <td class="p-2 whitespace-nowrap">{{ $a->activity_date->translatedFormat('d F Y') }} @if($a->is_h7)<span class="text-xs bg-red-600 text-white px-1 rounded">H-{{ $a->days_to_event }}</span>@endif</td>
   <td class="p-2"><span class="text-xs px-1 rounded text-white" style="background:{{ $a->section->color }}">{{ $a->section->short_name }}</span></td>
   <td class="p-2"><a href="/kegiatan/{{ $a->id }}" class="text-blue-700 hover:underline font-medium">{{ $a->title }}</a><br><span class="text-xs text-slate-500">{{ $a->account_code }} · {{ \Str::limit($a->program_name,60) }}</span></td>
   <td class="p-2 text-right">{{ number_format($a->requirement_qty,0,',','.') }}</td>

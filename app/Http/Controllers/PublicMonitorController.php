@@ -45,7 +45,7 @@ class PublicMonitorController extends Controller
                 'textColor' => '#fff',
                 'extendedProps' => [
                     'judul' => $a->title,
-                    'tanggal' => $a->activity_date->format('d M Y'),
+                    'tanggal' => $a->activity_date->translatedFormat('l, d F Y'),
                     'bidang' => $a->section->name,
                     'section_color' => $a->section->color,
                     'kode_rekening' => $a->account_code,

@@ -6,7 +6,7 @@
 <div class="bg-white rounded shadow overflow-x-auto mb-6">
 <table class="w-full text-sm"><thead class="bg-slate-100"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Kegiatan</th><th class="p-2">Status</th><th class="p-2">Aksi</th></tr></thead>
 <tbody>@foreach($queue as $a)<tr class="border-t">
-<td class="p-2">{{ $a->activity_date->format('Y-m-d') }}</td>
+<td class="p-2">{{ $a->activity_date->translatedFormat('d F Y') }}</td>
 <td class="p-2"><a href="/kegiatan/{{ $a->id }}" class="text-blue-700 hover:underline">{{ $a->title }}</a><br><span class="text-xs text-slate-500">{{ $a->section->name }}</span></td>
 <td class="p-2 text-center text-xs">{{ $a->status }}</td>
 <td class="p-2"><form action="/verifikasi/{{ $a->id }}" method="POST" class="flex gap-1">@csrf
