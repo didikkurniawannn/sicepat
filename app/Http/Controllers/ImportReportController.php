@@ -63,12 +63,15 @@ class ImportReportController extends Controller
         $summary = [
             'pagu' => (clone $q)->sum('budget_pagu'),
             'realisasi' => (clone $q)->sum('budget_realization'),
+            'kebutuhan' => (clone $q)->sum('requirement_qty'),
+            'jumlah' => (clone $q)->sum('total_qty'),
         ];
         $summary['sisa'] = $summary['pagu'] - $summary['realisasi'];
         $summary['pct'] = $summary['pagu'] > 0 ? round($summary['realisasi'] / $summary['pagu'] * 100, 1) : 0;
         $perRekening = (clone $q)->get()->groupBy('account_code')->map(fn($g) => [
             'code' => $g->first()->account_code, 'count' => $g->count(),
             'pagu' => $g->sum('budget_pagu'), 'realisasi' => $g->sum('budget_realization'),
+            'kebutuhan' => $g->sum('requirement_qty'), 'jumlah' => $g->sum('total_qty'),
         ])->values();
         $activities = $q->orderBy('activity_date')->paginate(20)->withQueryString();
         return view('reports.index', compact('activities','sections','summary','perRekening'));

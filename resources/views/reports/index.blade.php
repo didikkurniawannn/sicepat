@@ -2,11 +2,13 @@
 @section('title','Laporan')
 @section('content')
 <h1 class="text-xl font-bold mb-3">Laporan Realisasi Anggaran</h1>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Total Pagu</p><p class="font-bold">Rp {{ number_format($summary['pagu'],0,',','.') }}</p></div>
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Realisasi</p><p class="font-bold text-green-700">Rp {{ number_format($summary['realisasi'],0,',','.') }}</p></div>
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Sisa</p><p class="font-bold">Rp {{ number_format($summary['sisa'],0,',','.') }}</p></div>
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">% Realisasi</p><p class="font-bold">{{ $summary['pct'] }}%</p></div>
+  <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Total Kebutuhan</p><p class="font-bold text-blue-700">{{ number_format($summary['kebutuhan'],0,',','.') }}</p></div>
+  <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Total Jumlah (DPA)</p><p class="font-bold">{{ number_format($summary['jumlah'],0,',','.') }}</p></div>
 </div>
 <form class="bg-white rounded shadow p-3 flex flex-wrap gap-2 text-sm mb-4" method="GET">
   <select name="section_id" class="border rounded px-2 py-1"><option value="">Semua Unit</option>@foreach($sections as $s)<option value="{{ $s->id }}" @selected(request('section_id')==$s->id)>{{ $s->name }}</option>@endforeach</select>
@@ -18,10 +20,10 @@
   <a href="/laporan/pdf?{{ http_build_query(request()->all()) }}" class="bg-red-600 text-white px-3 py-1 rounded">Export PDF</a>
 </form>
 <h2 class="font-semibold mb-2">Per Kode Rekening</h2>
-<div class="bg-white rounded shadow overflow-x-auto mb-4"><table class="w-full text-sm"><thead class="bg-slate-100"><tr><th class="p-2 text-left">Kode</th><th class="p-2">Jml</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th></tr></thead>
-<tbody>@foreach($perRekening as $r)<tr class="border-t"><td class="p-2 font-mono">{{ $r['code'] }}</td><td class="p-2 text-center">{{ $r['count'] }}</td><td class="p-2 text-right">{{ number_format($r['pagu'],0,',','.') }}</td><td class="p-2 text-right">{{ number_format($r['realisasi'],0,',','.') }}</td></tr>@endforeach</tbody></table></div>
+<div class="bg-white rounded shadow overflow-x-auto mb-4"><table class="w-full text-sm"><thead class="bg-slate-100"><tr><th class="p-2 text-left">Kode</th><th class="p-2">Jml</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th></tr></thead>
+<tbody>@foreach($perRekening as $r)<tr class="border-t"><td class="p-2 font-mono">{{ $r['code'] }}</td><td class="p-2 text-center">{{ $r['count'] }}</td><td class="p-2 text-right font-semibold text-blue-700">{{ number_format($r['kebutuhan'],0,',','.') }}</td><td class="p-2 text-right">{{ number_format($r['jumlah'],0,',','.') }}</td><td class="p-2 text-right">{{ number_format($r['pagu'],0,',','.') }}</td><td class="p-2 text-right">{{ number_format($r['realisasi'],0,',','.') }}</td></tr>@endforeach</tbody></table></div>
 <h2 class="font-semibold mb-2">Detail Kegiatan</h2>
-<div class="bg-white rounded shadow overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-100"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Judul</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa</th></tr></thead>
-<tbody>@foreach($activities as $a)<tr class="border-t"><td class="p-2">{{ $a->activity_date->translatedFormat('d F Y') }}</td><td class="p-2"><a class="text-blue-700" href="/kegiatan/{{ $a->id }}">{{ $a->title }}</a><br><span class="text-xs text-slate-500">{{ $a->section->name }}</span></td><td class="p-2 text-right">{{ number_format($a->budget_pagu,0,',','.') }}</td><td class="p-2 text-right">{{ number_format($a->budget_realization,0,',','.') }}</td><td class="p-2 text-right font-semibold">{{ number_format($a->budget_pagu - $a->budget_realization,0,',','.') }}</td></tr>@endforeach</tbody></table></div>
+<div class="bg-white rounded shadow overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-100"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Judul</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa</th></tr></thead>
+<tbody>@foreach($activities as $a)<tr class="border-t"><td class="p-2">{{ $a->activity_date->translatedFormat('d F Y') }}</td><td class="p-2"><a class="text-blue-700" href="/kegiatan/{{ $a->id }}">{{ $a->title }}</a><br><span class="text-xs text-slate-500">{{ $a->section->name }}</span></td><td class="p-2 text-right font-semibold text-blue-700">{{ number_format($a->requirement_qty,0,',','.') }}</td><td class="p-2 text-right">{{ number_format($a->total_qty,0,',','.') }}</td><td class="p-2 text-xs whitespace-nowrap">{{ $a->unit }}</td><td class="p-2 text-right">{{ number_format($a->budget_pagu,0,',','.') }}</td><td class="p-2 text-right">{{ number_format($a->budget_realization,0,',','.') }}</td><td class="p-2 text-right font-semibold">{{ number_format($a->budget_pagu - $a->budget_realization,0,',','.') }}</td></tr>@endforeach</tbody></table></div>
 <div class="mt-2">{{ $activities->links() }}</div>
 @endsection
