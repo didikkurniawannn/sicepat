@@ -17,6 +17,28 @@
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Total Kebutuhan (filter aktif)</p><p class="text-xl font-bold">{{ number_format($totals['kebutuhan'],0,',','.') }}</p></div>
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Total Jumlah (DPA)</p><p class="text-xl font-bold">{{ number_format($totals['jumlah'],0,',','.') }}</p></div>
 </div>
+<div class="bg-white rounded shadow p-3 mb-4 text-sm">
+  <h2 class="font-bold mb-2">Rincian Pagu per Kode Rekening <span class="text-xs font-normal text-slate-500">(kode yang sama digabung · mengikuti filter aktif)</span></h2>
+  <div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-100"><tr><th class="p-2 text-left">Kode Rekening</th><th class="p-2 text-center">Jml Kegiatan</th><th class="p-2 text-right">Total Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa</th></tr></thead>
+    <tbody>
+    @foreach($perRekening as $r)
+    <tr class="border-t hover:bg-slate-50">
+      <td class="p-2 font-mono">{{ $r['code'] }}</td>
+      <td class="p-2 text-center">{{ $r['count'] }}</td>
+      <td class="p-2 text-right font-semibold">{{ number_format($r['pagu'],0,',','.') }}</td>
+      <td class="p-2 text-right">{{ number_format($r['realisasi'],0,',','.') }}</td>
+      <td class="p-2 text-right">{{ number_format($r['sisa'],0,',','.') }}</td>
+    </tr>
+    @endforeach
+    </tbody>
+    <tfoot class="bg-slate-50 font-semibold">
+    <tr class="border-t"><td class="p-2 text-right" colspan="2">Total ({{ $perRekening->count() }} rekening):</td><td class="p-2 text-right">{{ number_format($perRekening->sum('pagu'),0,',','.') }}</td><td class="p-2 text-right">{{ number_format($perRekening->sum('realisasi'),0,',','.') }}</td><td class="p-2 text-right">{{ number_format($perRekening->sum('sisa'),0,',','.') }}</td></tr>
+    </tfoot>
+  </table>
+  </div>
+</div>
 <div class="bg-white rounded shadow overflow-x-auto">
 <table class="w-full text-sm">
 <thead class="bg-slate-100"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran</th><th class="p-2">Status</th></tr></thead>

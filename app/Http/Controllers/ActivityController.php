@@ -31,15 +31,31 @@ class ActivityController extends Controller
         }
         if ($request->filled('pptk_id')) $q->where('pptk_id', $request->pptk_id);
 
-        $activities = $q->paginate(15)->withQueryString();
+        // Catatan: rekap dihitung SEBELUM paginate karena paginate() menempelkan limit/offset ke query builder
         $totals = [
             'kebutuhan' => (clone $q)->sum('requirement_qty'),
             'jumlah' => (clone $q)->sum('total_qty'),
         ];
+        // Rincian pagu dikelompokkan per kode rekening yang sama (mengikuti filter aktif)
+        $perRekening = (clone $q)->get(['account_code', 'budget_pagu', 'budget_realization'])
+            ->groupBy('account_code')
+            ->map(function ($g, $code) {
+                $pagu = $g->sum('budget_pagu');
+                $real = $g->sum('budget_realization');
+                return [
+                    'code' => $code,
+                    'count' => $g->count(),
+                    'pagu' => $pagu,
+                    'realisasi' => $real,
+                    'sisa' => $pagu - $real,
+                ];
+            })->sortKeys()->values();
+
+        $activities = $q->paginate(15)->withQueryString();
         $sections = Section::orderBy('order')->get();
         $statuses = ['draft','diajukan','diverifikasi','disetujui','berjalan','selesai','ditolak'];
 
-        return view('activities.index', compact('activities','sections','statuses','totals'));
+        return view('activities.index', compact('activities','sections','statuses','totals','perRekening'));
     }
 
     public function create()
