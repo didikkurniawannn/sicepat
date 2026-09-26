@@ -10,7 +10,7 @@ class CalendarController extends Controller
 {
     public function index(Request $request)
     {
-        $sections = Section::orderBy('order')->get();
+        $sections = Section::active()->orderBy('order')->get();
         return view('calendar.index', compact('sections'));
     }
 

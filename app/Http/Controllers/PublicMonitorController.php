@@ -10,7 +10,7 @@ class PublicMonitorController extends Controller
 {
     public function index()
     {
-        $sections = Section::orderBy('order')->get()->map(function ($s) {
+        $sections = Section::active()->orderBy('order')->get()->map(function ($s) {
             $qq = Activity::where('section_id', $s->id);
             $s->activity_count = (clone $qq)->count();
             $ss = Activity::budgetSums($qq);

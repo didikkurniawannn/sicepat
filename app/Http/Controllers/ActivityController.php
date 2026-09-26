@@ -54,7 +54,7 @@ class ActivityController extends Controller
             })->sortKeys()->values();
 
         $activities = $q->paginate(15)->withQueryString();
-        $sections = Section::orderBy('order')->get();
+        $sections = Section::active()->orderBy('order')->get();
         $statuses = ['draft','diajukan','diverifikasi','disetujui','berjalan','selesai','ditolak'];
 
         return view('activities.index', compact('activities','sections','statuses','totals','perRekening'));
@@ -63,7 +63,7 @@ class ActivityController extends Controller
     public function create()
     {
         $this->authorizeInput();
-        $sections = Section::orderBy('order')->get();
+        $sections = Section::active()->orderBy('order')->get();
         $pptks = User::role('kasi')->with('section')->get();
         return view('activities.form', ['activity' => new Activity(), 'sections' => $sections, 'pptks' => $pptks]);
     }
@@ -88,7 +88,7 @@ class ActivityController extends Controller
     public function edit(Activity $activity)
     {
         $this->authorizeInput($activity);
-        $sections = Section::orderBy('order')->get();
+        $sections = Section::active()->orderBy('order')->get();
         $pptks = User::role('kasi')->with('section')->get();
         return view('activities.form', ['activity' => $activity, 'sections' => $sections, 'pptks' => $pptks]);
     }

@@ -33,7 +33,7 @@ class DashboardController extends Controller
         $realisasi = $sums['realisasi'];
         $sisa = $sums['sisa'];
 
-        $perSection = Section::orderBy('order')->get()->map(function ($s) use ($user) {
+        $perSection = Section::active()->orderBy('order')->get()->map(function ($s) use ($user) {
             $qq = Activity::where('section_id', $s->id);
         if ($user->hasAnyRole(['kasi','staf'])) {
                 if ($s->id !== $user->section_id) return null;

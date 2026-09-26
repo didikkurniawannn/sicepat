@@ -13,4 +13,6 @@ class Section extends Model
 
     public function activities(): HasMany { return $this->hasMany(Activity::class); }
     public function users(): HasMany { return $this->hasMany(User::class); }
+
+    public function scopeActive($q) { return $q->where('is_active', true); }
 }

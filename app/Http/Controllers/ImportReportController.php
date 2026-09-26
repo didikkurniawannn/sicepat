@@ -59,7 +59,7 @@ class ImportReportController extends Controller
         if ($request->filled('month')) $q->whereMonth('activity_date', $request->month);
         if ($request->filled('year')) $q->whereYear('activity_date', $request->year);
         // Catatan: rekap dihitung SEBELUM paginate karena paginate() menempelkan limit/offset ke query builder
-        $sections = \App\Models\Section::orderBy('order')->get();
+        $sections = \App\Models\Section::active()->orderBy('order')->get();
         // Pagu & realisasi per kode rekening TANPA penjumlahan: diambil dari baris
         // wakil (kegiatan paling awal); kebutuhan tetap dijumlahkan per kegiatan.
         $perRekening = (clone $q)->orderBy('activity_date')->orderBy('id')->get()->groupBy('account_code')->map(function ($g, $code) {
@@ -125,7 +125,7 @@ class ImportReportController extends Controller
     public function h7(Request $request)
     {
         $activities = $this->h7Query($request)->get();
-        $sections = \App\Models\Section::orderBy('order')->get();
+        $sections = \App\Models\Section::active()->orderBy('order')->get();
         $waData = $activities->map(fn($a) => [
             'h' => $a->days_to_event,
             'tgl' => $a->activity_date->translatedFormat('d F Y'),

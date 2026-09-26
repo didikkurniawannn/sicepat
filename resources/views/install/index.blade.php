@@ -39,7 +39,7 @@
     <input type="hidden" name="token" value="{{ $token }}">
     <label class="flex items-start gap-2 bg-yellow-50 border border-yellow-300 rounded p-3">
       <input type="checkbox" name="confirm" value="1" class="mt-1" required>
-      <span>Saya paham instalasi akan <strong>menghapus & membuat ulang</strong> seluruh tabel lalu mengisi data awal (7 unit kerja, 58 kegiatan, 17 akun demo).</span>
+      <span>Saya paham instalasi akan <strong>menghapus & membuat ulang</strong> seluruh tabel lalu mengisi data awal (6 unit kerja aktif, 58 kegiatan, 8 akun demo).</span>
     </label>
     <button @disabled(!$allOk) class="w-full bg-slate-900 text-white py-2 rounded font-semibold disabled:opacity-40">🚀 Jalankan Migrasi + Seed Data</button>
     @unless($allOk)<p class="text-red-600 text-xs">Lengkapi persyaratan bertanda ❌ di atas sebelum instalasi.</p>@endunless

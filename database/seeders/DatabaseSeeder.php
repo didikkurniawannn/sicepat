@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             ['code'=>'SSB','name'=>'Seksi Sosial dan Budaya','short_name'=>'Sosbud','type'=>'seksi','color'=>'#F59E0B','order'=>3,'head_name'=>'Kasi Sosial dan Budaya'],
             ['code'=>'SPM','name'=>'Seksi Pemberdayaan Masyarakat','short_name'=>'PM','type'=>'seksi','color'=>'#8B5CF6','order'=>4,'head_name'=>'Kasi Pemberdayaan Masyarakat'],
             ['code'=>'SKT','name'=>'Seksi Keamanan dan Ketertiban Umum','short_name'=>'Trantib','type'=>'seksi','color'=>'#EF4444','order'=>5,'head_name'=>'Kasi Trantibum'],
-            ['code'=>'TMV','name'=>'Tim Monev Kecamatan','short_name'=>'Monev','type'=>'tim','color'=>'#06B6D4','order'=>6,'head_name'=>'Ketua Tim Monev'],
+            ['code'=>'TMV','name'=>'Tim Monev Kecamatan','short_name'=>'Monev','type'=>'tim','color'=>'#06B6D4','order'=>6,'head_name'=>'Ketua Tim Monev','is_active'=>false],
             ['code'=>'SBU','name'=>'Sub Bagian Umum dan Kepegawaian','short_name'=>'Umpeg','type'=>'sub_bagian','color'=>'#6B7280','order'=>7,'head_name'=>'Kasubbag Umum dan Kepegawaian'],
         ];
         foreach ($sections as $s) {
@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
         $mkUser('Staf Umum', 'staf@sicepatkeg.local', 'staf', 'SBU');
 
         foreach ($secByCode as $code => $sec) {
+            if (!$sec->is_active) continue; // unit nonaktif (mis. Monev) tidak dibuatkan akun
             // Kasi merangkap tugas PPTK (persiapan H-7 & update progress)
             $mkUser('Kasi '.$sec->short_name.' ('.$code.')', strtolower($code).'.kasi@sicepatkeg.local', 'kasi', $code);
         }
@@ -61,6 +62,10 @@ class DatabaseSeeder extends Seeder
         foreach ($rows as $row) {
             $section = $secByName[$row['section']] ?? null;
             if (!$section) continue;
+            if (!$section->is_active) {
+                // Kegiatan unit nonaktif (mis. Tim Monev) dialihkan ke Seksi Pemerintahan
+                $section = $secByCode['SPR'];
+            }
             $pptk = User::role('kasi')->where('section_id', $section->id)->first();
             $date = \Carbon\Carbon::parse($row['activity_date']);
             // Status heuristik: realisasi>0 & tanggal lewat => selesai/berjalan, else draft

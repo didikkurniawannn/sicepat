@@ -12,7 +12,7 @@
   <div class="bg-white rounded shadow p-4 border-2 border-red-400"><p class="text-xs text-slate-500">⚠ H-7 (butuh persiapan Kasi)</p><p class="text-2xl font-bold text-red-600">{{ $h7 }}</p><a href="/laporan/h7" class="text-xs text-blue-700 hover:underline">Buka pengingat H-7 →</a></div>
 </div>
 
-<h2 class="font-bold mb-2">Kegiatan per Unit Kerja (7 unit)</h2>
+<h2 class="font-bold mb-2">Kegiatan per Unit Kerja ({{ $perSection->count() }} unit)</h2>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
   @foreach($perSection as $x)
   <a href="/unit-kerja/{{ $x['section']->id }}" class="bg-white rounded shadow p-4 border-t-4" style="border-color:{{ $x['section']->color }}">
