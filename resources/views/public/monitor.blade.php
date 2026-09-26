@@ -11,6 +11,8 @@
 <style>
   #tooltip { position: fixed; z-index: 100; max-width: 320px; pointer-events: none; display: none; }
   .fc-event { cursor: pointer; }
+  .fc-day-past { background-color: #F1F5F9 !important; }
+  .fc-day-past .fc-daygrid-day-number { color: #94A3B8; }
 </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
@@ -40,7 +42,8 @@
           <span class="font-semibold">{{ $a->activity_date->translatedFormat('d F Y') }}</span>
           @if($a->is_h7)<span class="text-xs bg-red-600 text-white px-1 rounded">H-{{ $a->days_to_event }}</span>@endif
           <br>{{ $a->title }}
-          <br><span class="text-xs text-slate-500">{{ $a->section->name }} · {{ $a->status }} · Rp {{ number_format($a->budget_pagu,0,',','.') }}</span>
+          <br><span class="text-xs text-slate-500">{{ $a->section->name }} · Rp {{ number_format($a->budget_pagu,0,',','.') }}</span>
+          <span class="text-xs px-1 rounded {{ $a->status === 'selesai' ? 'bg-green-600 text-white' : 'bg-slate-200' }}">{{ $a->status === 'selesai' ? '✓ ' : '' }}{{ $a->status }}</span>
         </li>
         @empty
         <li class="text-slate-500">Tidak ada kegiatan dalam 7 hari ke depan.</li>
@@ -48,12 +51,17 @@
       </ul>
     </div>
     <div class="bg-white rounded shadow p-4 md:col-span-2">
-      <div class="flex flex-wrap items-center gap-2 mb-3">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
         <h2 class="font-bold flex-1">🗓️ Kalender Kegiatan <span class="text-xs font-normal text-slate-500">(arahkan kursor / sorot untuk detail, klik untuk rincian penuh)</span></h2>
         <select id="fSection" class="border rounded px-2 py-1 text-sm">
           <option value="">Semua Unit</option>
           @foreach($sections as $s)<option value="{{ $s->id }}">{{ $s->name }}</option>@endforeach
         </select>
+      </div>
+      <div class="flex flex-wrap gap-1 text-xs mb-3">
+        <span class="px-2 py-0.5 rounded bg-green-600 text-white">✓ Selesai</span>
+        <span class="px-2 py-0.5 rounded bg-red-600 text-white">⚠ H-7 perlu persiapan</span>
+        <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-500">Tanggal terlewati</span>
       </div>
       <div id="cal"></div>
     </div>
@@ -94,7 +102,7 @@ const tip = document.getElementById('tooltip');
 function tipHtml(p) {
   return `<p class="font-bold text-sm mb-1">${p.judul}</p>
     <p>📅 ${p.tanggal} ${p.is_h7 ? '· ⚠ H-' + p.days : ''}</p>
-    <p>🏢 ${p.bidang} · <span class="bg-slate-700 px-1 rounded">${p.status}</span></p>
+    <p>🏢 ${p.bidang} · <span class="${p.status === 'selesai' ? 'bg-green-600' : 'bg-slate-700'} px-1 rounded">${p.status === 'selesai' ? '✓ selesai' : p.status}</span>${p.is_past && p.status !== 'selesai' ? ' · <span class="text-slate-400">terlewati</span>' : ''}</p>
     <p class="mt-1 text-slate-300">${p.kode_rekening}</p>
     <p>Pagu ${fmt(p.pagu)} · Realisasi ${fmt(p.realisasi)} · Sisa ${fmt(p.sisa)}</p>
     <p class="text-slate-400 mt-1">Sorot = ringkas · Klik = rincian penuh</p>`;
@@ -103,6 +111,7 @@ function tipHtml(p) {
 function modalHtml(p) {
   return `<h3 class="font-bold text-lg mb-1">${p.judul}</h3>
     <p class="text-xs mb-3"><span class="px-2 py-0.5 rounded text-white" style="background:${p.section_color}">${p.bidang}</span>
+    ${p.status === 'selesai' ? '<span class="bg-green-600 text-white px-2 py-0.5 rounded ml-1">✓ Selesai dilaksanakan</span>' : ''}
     ${p.is_h7 ? '<span class="bg-red-600 text-white px-2 py-0.5 rounded ml-1">⚠ H-' + p.days + ' perlu persiapan</span>' : ''}</p>
     <table class="w-full">
       <tr class="border-t"><td class="py-1 text-slate-500 w-32">Tanggal</td><td class="font-medium">${p.tanggal}</td></tr>
@@ -123,6 +132,15 @@ document.getElementById('modal').addEventListener('click', e => { if (e.target.i
 const calendar = new FullCalendar.Calendar(document.getElementById('cal'), {
   initialView: 'dayGridMonth', locale: 'id', height: 'auto',
   headerToolbar: {left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek,listMonth'},
+  dayCellClassNames: function(arg){
+    const today = new Date(); today.setHours(0,0,0,0);
+    return arg.date < today ? ['fc-day-past'] : [];
+  },
+  eventDidMount: function(info){
+    if (info.event.extendedProps.is_past && info.event.extendedProps.status !== 'selesai') {
+      info.el.style.opacity = '0.55';
+    }
+  },
   events: function(info, success, failure){
     fetch('/api/pantau/events?section_id=' + document.getElementById('fSection').value)
       .then(r => r.json()).then(success).catch(failure);

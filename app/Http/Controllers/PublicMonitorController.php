@@ -38,11 +38,12 @@ class PublicMonitorController extends Controller
         return $q->orderBy('activity_date')->get()->map(function ($a) {
             $days = $a->days_to_event;
             $isH7 = $a->is_h7;
+            $done = $a->status === 'selesai';
             return [
                 'id' => $a->id,
-                'title' => $a->title.' ('.$a->section->short_name.')',
+                'title' => ($done ? '✓ ' : '').$a->title.' ('.$a->section->short_name.')',
                 'start' => $a->activity_date->format('Y-m-d'),
-                'color' => $isH7 ? '#DC2626' : ($a->section->color ?? '#3B82F6'),
+                'color' => $done ? '#16A34A' : ($isH7 ? '#DC2626' : ($a->section->color ?? '#3B82F6')),
                 'textColor' => '#fff',
                 'extendedProps' => [
                     'judul' => $a->title,
@@ -61,6 +62,7 @@ class PublicMonitorController extends Controller
                     'pptk' => $a->pptk->name ?? '-',
                     'is_h7' => $isH7,
                     'days' => $days,
+                    'is_past' => $a->activity_date->lt(now()->startOfDay()),
                 ],
             ];
         });
