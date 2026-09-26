@@ -128,11 +128,29 @@ class ActivityController extends Controller
             $activity->budget_realization = $request->budget_realization;
         }
         $activity->progress = $request->progress;
-        if ($activity->progress >= 100) $activity->status = 'selesai';
-        elseif ($activity->progress > 0 && in_array($activity->status, ['disetujui','diverifikasi','draft'])) $activity->status = 'berjalan';
+        // Status SELESAI tidak otomatis dari angka — hanya lewat aksi eksplisit "sudah dilaksanakan".
+        // Di sini progress hanya bisa menggerakkan status ke 'berjalan'.
+        if ($activity->progress > 0 && in_array($activity->status, ['disetujui','diverifikasi','draft'])) $activity->status = 'berjalan';
         $activity->save();
         ActivityLog::create(['user_id' => auth()->id(), 'action' => 'update_progress', 'model_type' => Activity::class, 'model_id' => $activity->id, 'description' => "Progress {$activity->progress}% & realisasi Rp ".number_format($activity->budget_realization,0,',','.')]);
         return back()->with('success', 'Progress & realisasi diperbarui.');
+    }
+
+    /**
+     * Menandai kegiatan SUDAH DILAKSANAKAN (status = selesai).
+     * Murni berdasarkan pelaksanaan di lapangan, bukan dari % realisasi/progress.
+     */
+    public function selesaikan(Request $request, Activity $activity)
+    {
+        $this->authorizeInput($activity);
+        $activity->update(['status' => 'selesai', 'progress' => 100]);
+        Verification::create([
+            'activity_id' => $activity->id, 'user_id' => auth()->id(),
+            'role_at_time' => auth()->user()->getRoleNames()->first() ?? '-',
+            'decision' => 'disetujui', 'note' => 'Kegiatan ditandai sudah dilaksanakan di lapangan.',
+        ]);
+        ActivityLog::create(['user_id' => auth()->id(), 'action' => 'complete_activity', 'model_type' => Activity::class, 'model_id' => $activity->id, 'description' => "Kegiatan ditandai selesai dilaksanakan: {$activity->title}"]);
+        return back()->with('success', 'Kegiatan ditandai sudah dilaksanakan (selesai).');
     }
 
     public function uploadDoc(Request $request, Activity $activity)

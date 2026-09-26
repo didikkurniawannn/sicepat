@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/kegiatan/{activity}', [ActivityController::class, 'destroy']);
     Route::post('/kegiatan/{activity}/ajukan', [ActivityController::class, 'ajukan']);
     Route::post('/kegiatan/{activity}/progress', [ActivityController::class, 'updateProgress']);
+    Route::post('/kegiatan/{activity}/selesai', [ActivityController::class, 'selesaikan']);
     Route::post('/kegiatan/{activity}/dokumen', [ActivityController::class, 'uploadDoc']);
 
     Route::get('/kalender', [CalendarController::class, 'index']);

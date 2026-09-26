@@ -36,6 +36,10 @@
     @if(auth()->user()->hasAnyRole(['admin','kasi']))
     <form action="/kegiatan/{{ $activity->id }}/ajukan" method="POST" class="mt-3">@csrf<button class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">Ajukan Verifikasi</button></form>
     @endif
+    @if(auth()->user()->hasAnyRole(['admin','kasi']) && $activity->status !== 'selesai')
+    <form action="/kegiatan/{{ $activity->id }}/selesai" method="POST" class="mt-2" onsubmit="return confirm('Tandai kegiatan ini SUDAH DILAKSANAKAN di lapangan?')">@csrf<button class="bg-green-600 text-white px-3 py-1 rounded text-sm">✅ Tandai Sudah Dilaksanakan</button></form>
+    <p class="text-xs text-slate-500 mt-1">Status selesai berdasarkan pelaksanaan, bukan % realisasi.</p>
+    @endif
   </div>
 
   <div class="bg-white rounded shadow p-4 text-sm">
@@ -62,6 +66,7 @@
 <div class="space-y-4">
   <div class="bg-white rounded shadow p-4 text-sm">
     <h2 class="font-bold mb-2">Update Progress & Realisasi (Kasi)</h2>
+    <p class="text-xs text-slate-500 mb-2">Angka progress/realisasi tidak mengubah status selesai.</p>
     <form action="/kegiatan/{{ $activity->id }}/progress" method="POST" class="space-y-2">@csrf
       <div><label>Progress %</label><input type="number" name="progress" min="0" max="100" value="{{ $activity->progress }}" class="w-full border rounded px-2 py-1"></div>
       <div><label>Realisasi (Rp)</label><input type="number" name="budget_realization" value="{{ $activity->budget_realization }}" class="w-full border rounded px-2 py-1"></div>
