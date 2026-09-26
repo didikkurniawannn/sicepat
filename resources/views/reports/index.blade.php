@@ -15,6 +15,7 @@
   <input name="month" type="number" min="1" max="12" value="{{ request('month') }}" placeholder="Bulan" class="border rounded px-2 py-1 w-24">
   <input name="year" type="number" value="{{ request('year') }}" placeholder="Tahun" class="border rounded px-2 py-1 w-24">
   <button class="bg-blue-600 text-white px-3 py-1 rounded">Filter</button>
+  <a href="/laporan/h7" class="bg-amber-500 text-white px-3 py-1 rounded font-semibold">🔔 Laporan H-7</a>
   <a href="/laporan/excel?{{ http_build_query(request()->all()) }}" class="bg-green-600 text-white px-3 py-1 rounded">Export Excel</a>
   <a href="/laporan/pdf?{{ http_build_query(request()->all()) }}" class="bg-red-600 text-white px-3 py-1 rounded">Export PDF</a>
 </form>

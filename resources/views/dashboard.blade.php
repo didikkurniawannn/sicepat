@@ -9,7 +9,7 @@
   <div class="bg-white rounded shadow p-4"><p class="text-xs text-slate-500">Berjalan / Proses</p><p class="text-2xl font-bold text-blue-600">{{ $berjalan }}</p></div>
   <div class="bg-white rounded shadow p-4"><p class="text-xs text-slate-500">Selesai</p><p class="text-2xl font-bold text-green-600">{{ $selesai }}</p></div>
   <div class="bg-white rounded shadow p-4"><p class="text-xs text-slate-500">Ditolak</p><p class="text-2xl font-bold text-red-600">{{ $ditolak }}</p></div>
-  <div class="bg-white rounded shadow p-4 border-2 border-red-400"><p class="text-xs text-slate-500">⚠ H-7 (butuh persiapan Kasi)</p><p class="text-2xl font-bold text-red-600">{{ $h7 }}</p></div>
+  <div class="bg-white rounded shadow p-4 border-2 border-red-400"><p class="text-xs text-slate-500">⚠ H-7 (butuh persiapan Kasi)</p><p class="text-2xl font-bold text-red-600">{{ $h7 }}</p><a href="/laporan/h7" class="text-xs text-blue-700 hover:underline">Buka pengingat H-7 →</a></div>
 </div>
 
 <h2 class="font-bold mb-2">Kegiatan per Unit Kerja (7 unit)</h2>

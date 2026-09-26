@@ -52,6 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan', [ImportReportController::class, 'reports']);
     Route::get('/laporan/excel', [ImportReportController::class, 'exportExcel']);
     Route::get('/laporan/pdf', [ImportReportController::class, 'exportPdf']);
+    Route::get('/laporan/h7', [ImportReportController::class, 'h7']);
+    Route::get('/laporan/h7/excel', [ImportReportController::class, 'h7Excel']);
+    Route::get('/laporan/h7/pdf', [ImportReportController::class, 'h7Pdf']);
 
     Route::get('/unit-kerja', [SectionUserController::class, 'sections']);
     Route::get('/unit-kerja/{section}', [SectionUserController::class, 'sectionShow']);

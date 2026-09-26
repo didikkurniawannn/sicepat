@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:4px}th{background:#eee}.h{background:#dc2626;color:#fff;font-weight:bold;padding:1px 6px}</style></head>
+<body><h2>🔔 Pengingat H-7 — Rencana {{ now()->translatedFormat('d F Y') }} s.d. {{ now()->addDays(7)->translatedFormat('d F Y') }}</h2>
+<table><thead><tr><th>No</th><th>Tanggal</th><th>Sisa Hari</th><th>Kegiatan</th><th>Bidang</th><th>Kebutuhan</th><th>Lokasi</th><th>Penanggung Jawab</th><th>Status</th></tr></thead>
+<tbody>@forelse($activities as $a)<tr><td>{{ $loop->iteration }}</td><td>{{ $a->activity_date->translatedFormat('l, d F Y') }}</td><td><span class="h">H-{{ $a->days_to_event }}</span></td><td>{{ $a->title }}<br><small>{{ $a->account_code }}</small></td><td>{{ $a->section->short_name }}</td><td>{{ $a->requirement_qty }} / {{ $a->total_qty }} {{ $a->unit }}</td><td>{{ $a->location ?? '-' }}</td><td>{{ $a->pptk->name ?? '-' }}</td><td>{{ $a->status }}</td></tr>@empty<tr><td colspan="9">Tidak ada kegiatan dalam 7 hari ke depan.</td></tr>@endforelse</tbody></table>
+<p><small>Dicetak dari SiCepatKeg pada {{ now()->translatedFormat('d F Y H:i') }} WIB — mohon persiapan dokumen, anggaran, SDM & jadwal.</small></p>
+</body></html>

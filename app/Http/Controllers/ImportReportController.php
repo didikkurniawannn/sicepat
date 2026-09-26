@@ -107,4 +107,53 @@ class ImportReportController extends Controller
         $pdf = Pdf::loadView('reports.pdf', compact('activities', 'dupColors'))->setPaper('a4', 'landscape');
         return $pdf->download('laporan-kegiatan.pdf');
     }
+
+    // --- Laporan H-7 (pengingat untuk tim pelaksana, siap dibagikan) ---
+    private function h7Query(Request $request)
+    {
+        $user = auth()->user();
+        $q = \App\Models\Activity::with(['section', 'pptk', 'checklists'])
+            ->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
+            ->orderBy('activity_date');
+        if ($user->hasAnyRole(['kasi', 'staf']) && $user->section_id) {
+            $q->where('section_id', $user->section_id);
+        }
+        if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
+        return $q;
+    }
+
+    public function h7(Request $request)
+    {
+        $activities = $this->h7Query($request)->get();
+        $sections = \App\Models\Section::orderBy('order')->get();
+        $waData = $activities->map(fn($a) => [
+            'h' => $a->days_to_event,
+            'tgl' => $a->activity_date->translatedFormat('d F Y'),
+            'judul' => $a->title,
+            'unit' => $a->section->short_name,
+            'butuh' => $a->requirement_qty.'/'.$a->total_qty.' '.$a->unit,
+            'pj' => $a->pptk->name ?? '-',
+        ])->values();
+        return view('reports.h7', compact('activities', 'sections', 'waData'));
+    }
+
+    public function h7Excel(Request $request)
+    {
+        $filters = $request->only(['section_id', 'status']);
+        $user = auth()->user();
+        if ($user->hasAnyRole(['kasi', 'staf']) && $user->section_id) {
+            $filters['section_id'] = $user->section_id;
+        }
+        return Excel::download(new ActivitiesExport(array_merge(
+            $filters,
+            ['from' => now()->toDateString(), 'to' => now()->addDays(7)->toDateString()]
+        )), 'pengingat-H7-kegiatan.xlsx');
+    }
+
+    public function h7Pdf(Request $request)
+    {
+        $activities = $this->h7Query($request)->get();
+        $pdf = Pdf::loadView('reports.h7pdf', compact('activities'))->setPaper('a4', 'landscape');
+        return $pdf->download('pengingat-H7-kegiatan.pdf');
+    }
 }
