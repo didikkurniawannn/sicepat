@@ -75,9 +75,15 @@ class DatabaseSeeder extends Seeder
                 $progress = 10;
             }
 
-            $act = Activity::updateOrCreate(
-                ['account_code' => $row['account_code'], 'title' => $row['title'], 'activity_date' => $row['activity_date']],
-                [
+            $act = Activity::where('account_code', $row['account_code'])
+                ->where('title', $row['title'])
+                ->whereDate('activity_date', $row['activity_date'])
+                ->first() ?? new Activity([
+                    'account_code' => $row['account_code'],
+                    'title' => $row['title'],
+                    'activity_date' => $row['activity_date'],
+                ]);
+            $act->fill([
                     'section_id' => $section->id,
                     'program_name' => $row['program_name'],
                     'requirement_qty' => $row['requirement_qty'],
@@ -91,6 +97,7 @@ class DatabaseSeeder extends Seeder
                     'created_by' => $admin->id,
                 ]
             );
+            $act->save();
 
             foreach ($checklistItems as $item) {
                 ActivityChecklist::firstOrCreate(
