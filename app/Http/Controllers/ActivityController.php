@@ -36,12 +36,13 @@ class ActivityController extends Controller
             'kebutuhan' => (clone $q)->sum('requirement_qty'),
             'jumlah' => (clone $q)->sum('total_qty'),
         ];
-        // Rincian pagu dikelompokkan per kode rekening yang sama (mengikuti filter aktif)
+        // Rincian pagu dikelompokkan per kode rekening yang sama (mengikuti filter aktif).
+        // Nilai yang SAMA pada rekening yang SAMA hanya dihitung 1x (tidak dijumlahkan berulang).
         $perRekening = (clone $q)->get(['account_code', 'budget_pagu', 'budget_realization'])
             ->groupBy('account_code')
             ->map(function ($g, $code) {
-                $pagu = $g->sum('budget_pagu');
-                $real = $g->sum('budget_realization');
+                $pagu = $g->pluck('budget_pagu')->unique()->sum();
+                $real = $g->pluck('budget_realization')->unique()->sum();
                 return [
                     'code' => $code,
                     'count' => $g->count(),
@@ -50,12 +51,14 @@ class ActivityController extends Controller
                     'sisa' => $pagu - $real,
                 ];
             })->sortKeys()->values();
+        // Peta sisa anggaran per rekening untuk kolom Sisa di tabel utama
+        $sisaPerRekening = $perRekening->pluck('sisa', 'code')->toArray();
 
         $activities = $q->paginate(15)->withQueryString();
         $sections = Section::orderBy('order')->get();
         $statuses = ['draft','diajukan','diverifikasi','disetujui','berjalan','selesai','ditolak'];
 
-        return view('activities.index', compact('activities','sections','statuses','totals','perRekening'));
+        return view('activities.index', compact('activities','sections','statuses','totals','perRekening','sisaPerRekening'));
     }
 
     public function create()
@@ -80,7 +83,10 @@ class ActivityController extends Controller
     public function show(Activity $activity)
     {
         $activity->load(['section','pptk','documents','checklists','verifications.user']);
-        return view('activities.show', compact('activity'));
+        // Sisa anggaran diakumulasikan per kode rekening yang sama (konsisten dengan Laporan)
+        $map = Activity::sisaPerRekening(Activity::where('account_code', $activity->account_code));
+        $rekSisa = $map[$activity->account_code] ?? $activity->budget_remaining;
+        return view('activities.show', compact('activity', 'rekSisa'));
     }
 
     public function edit(Activity $activity)

@@ -75,4 +75,17 @@ class Activity extends Model
         $real = $byRek->map(fn($g) => $g->pluck('budget_realization')->unique()->sum())->sum();
         return ['pagu' => $pagu, 'realisasi' => $real, 'sisa' => $pagu - $real];
     }
+
+    /**
+     * Peta sisa anggaran per kode rekening (akumulasi: pagu unik − realisasi unik).
+     * Dipakai modul Kegiatan agar sisa yang tampil konsisten dengan Laporan.
+     */
+    public static function sisaPerRekening($query): array
+    {
+        return (clone $query)->get(['account_code', 'budget_pagu', 'budget_realization'])
+            ->groupBy('account_code')
+            ->map(fn($g) => $g->pluck('budget_pagu')->unique()->sum()
+                - $g->pluck('budget_realization')->unique()->sum())
+            ->toArray();
+    }
 }
