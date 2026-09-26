@@ -27,7 +27,7 @@
       <tr class="border-t"><td class="py-1 text-slate-500">Kebutuhan / Jumlah / Satuan</td><td>{{ $activity->requirement_qty }} / {{ $activity->total_qty }} {{ $activity->unit }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Pagu</td><td>Rp {{ number_format($activity->budget_pagu,0,',','.') }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Realisasi ({{ $activity->realization_percent }}%)</td><td>Rp {{ number_format($activity->budget_realization,0,',','.') }}</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">Sisa Anggaran (akumulasi <span class="font-mono">{{ $activity->account_code }}</span>)</td><td class="font-bold text-blue-700">Rp {{ number_format($rekSisa,0,',','.') }}</td></tr>
+      <tr class="border-t"><td class="py-1 text-slate-500">Sisa (auto = Pagu − Realisasi)</td><td class="font-bold">Rp {{ number_format($activity->budget_remaining,0,',','.') }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Penanggung Jawab / Lokasi</td><td>{{ $activity->pptk->name ?? '-' }} / {{ $activity->location ?? '-' }}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Status / Progress</td><td><span class="bg-slate-200 px-2 rounded text-xs">{{ $activity->status }}</span> · {{ $activity->progress }}%</td></tr>
     </table>

@@ -41,7 +41,7 @@
 </div>
 <div class="bg-white rounded shadow overflow-x-auto">
 <table class="w-full text-sm">
-<thead class="bg-slate-100"><tr><th class="p-2 text-center">No</th><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran (per Rekening)</th><th class="p-2">Status</th>@if(auth()->user()->hasAnyRole(['admin','kasi']))<th class="p-2">Aksi</th>@endif</tr></thead>
+<thead class="bg-slate-100"><tr><th class="p-2 text-center">No</th><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Bidang</th><th class="p-2 text-left">Judul Kegiatan</th><th class="p-2 text-right">Kebutuhan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-left">Satuan</th><th class="p-2 text-right">Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa Anggaran</th><th class="p-2">Status</th>@if(auth()->user()->hasAnyRole(['admin','kasi']))<th class="p-2">Aksi</th>@endif</tr></thead>
 <tbody>
 @foreach($activities as $a)
 <tr class="border-t hover:bg-slate-50">
@@ -54,7 +54,7 @@
   <td class="p-2 text-xs whitespace-nowrap">{{ $a->unit }}</td>
   <td class="p-2 text-right">{{ number_format($a->budget_pagu,0,',','.') }}</td>
   <td class="p-2 text-right">{{ number_format($a->budget_realization,0,',','.') }}</td>
-  <td class="p-2 text-right font-semibold text-blue-700" title="Akumulasi kode rekening {{ $a->account_code }}">{{ number_format($sisaPerRekening[$a->account_code] ?? $a->budget_remaining,0,',','.') }}</td>
+  <td class="p-2 text-right font-semibold">{{ number_format($a->budget_remaining,0,',','.') }}</td>
   <td class="p-2 text-center"><span class="text-xs bg-slate-200 px-2 py-0.5 rounded">{{ $a->status }}</span></td>
   @if(auth()->user()->hasAnyRole(['admin','kasi']))
   <td class="p-2 text-center whitespace-nowrap">

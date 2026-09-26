@@ -85,15 +85,4 @@ class Activity extends Model
         $real = $reps->sum(fn($a) => (float) $a->budget_realization);
         return ['pagu' => $pagu, 'realisasi' => $real, 'sisa' => $pagu - $real];
     }
-
-    /**
-     * Peta sisa anggaran per kode rekening (pagu wakil − realisasi wakil).
-     * Dipakai modul Kegiatan agar sisa yang tampil konsisten dengan Laporan.
-     */
-    public static function sisaPerRekening($query): array
-    {
-        return self::representativePerRekening($query)
-            ->map(fn($a) => (float) $a->budget_pagu - (float) $a->budget_realization)
-            ->toArray();
-    }
 }

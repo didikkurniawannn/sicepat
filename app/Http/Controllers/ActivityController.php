@@ -52,14 +52,12 @@ class ActivityController extends Controller
                     'sisa' => $pagu - $real,
                 ];
             })->sortKeys()->values();
-        // Peta sisa anggaran per rekening untuk kolom Sisa di tabel utama
-        $sisaPerRekening = $perRekening->pluck('sisa', 'code')->toArray();
 
         $activities = $q->paginate(15)->withQueryString();
         $sections = Section::orderBy('order')->get();
         $statuses = ['draft','diajukan','diverifikasi','disetujui','berjalan','selesai','ditolak'];
 
-        return view('activities.index', compact('activities','sections','statuses','totals','perRekening','sisaPerRekening'));
+        return view('activities.index', compact('activities','sections','statuses','totals','perRekening'));
     }
 
     public function create()
@@ -84,10 +82,7 @@ class ActivityController extends Controller
     public function show(Activity $activity)
     {
         $activity->load(['section','pptk','documents','checklists','verifications.user']);
-        // Sisa anggaran diakumulasikan per kode rekening yang sama (konsisten dengan Laporan)
-        $map = Activity::sisaPerRekening(Activity::where('account_code', $activity->account_code));
-        $rekSisa = $map[$activity->account_code] ?? $activity->budget_remaining;
-        return view('activities.show', compact('activity', 'rekSisa'));
+        return view('activities.show', compact('activity'));
     }
 
     public function edit(Activity $activity)
