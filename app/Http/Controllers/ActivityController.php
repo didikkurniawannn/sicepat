@@ -119,11 +119,12 @@ class ActivityController extends Controller
 
     public function updateProgress(Request $request, Activity $activity)
     {
-        $request->validate(['progress' => 'required|integer|min:0|max:100', 'budget_realization' => 'nullable|numeric|min:0|lte:budget_pagu']);
+        // Realisasi dibandingkan ke pagu milik kegiatan (form tidak mengirim budget_pagu)
+        $request->validate([
+            'progress' => 'required|integer|min:0|max:100',
+            'budget_realization' => 'nullable|numeric|min:0|max:'.$activity->budget_pagu,
+        ]);
         if ($request->filled('budget_realization')) {
-            $request->validate(['budget_pagu' => 'nullable']);
-            $pagu = $request->input('budget_pagu', $activity->budget_pagu);
-            abort_if($request->budget_realization > $pagu, 422, 'Realisasi tidak boleh melebihi pagu.');
             $activity->budget_realization = $request->budget_realization;
         }
         $activity->progress = $request->progress;
