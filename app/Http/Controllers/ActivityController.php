@@ -37,12 +37,13 @@ class ActivityController extends Controller
             'jumlah' => (clone $q)->sum('total_qty'),
         ];
         // Rincian pagu dikelompokkan per kode rekening yang sama (mengikuti filter aktif).
-        // Nilai yang SAMA pada rekening yang SAMA hanya dihitung 1x (tidak dijumlahkan berulang).
-        $perRekening = (clone $q)->get(['account_code', 'budget_pagu', 'budget_realization'])
+        // TANPA penjumlahan: nilai diambil dari baris wakil (kegiatan paling awal).
+        $perRekening = (clone $q)->orderBy('activity_date')->orderBy('id')->get(['account_code', 'budget_pagu', 'budget_realization'])
             ->groupBy('account_code')
             ->map(function ($g, $code) {
-                $pagu = $g->pluck('budget_pagu')->unique()->sum();
-                $real = $g->pluck('budget_realization')->unique()->sum();
+                $wakil = $g->first();
+                $pagu = (float) $wakil->budget_pagu;
+                $real = (float) $wakil->budget_realization;
                 return [
                     'code' => $code,
                     'count' => $g->count(),

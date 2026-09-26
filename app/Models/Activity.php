@@ -63,29 +63,37 @@ class Activity extends Model
     }
 
     /**
-     * Total pagu & realisasi dengan aturan: nilai yang SAMA pada kode rekening
-     * yang SAMA hanya dihitung 1x (tidak dijumlahkan berulang).
+     * Baris wakil per kode rekening: kegiatan paling awal (tanggal, lalu id).
+     * Satu kode rekening = satu nilai (tidak ada penjumlahan sama sekali).
+     */
+    public static function representativePerRekening($query)
+    {
+        return (clone $query)->orderBy('activity_date')->orderBy('id')
+            ->get(['id', 'account_code', 'budget_pagu', 'budget_realization'])
+            ->groupBy('account_code')
+            ->map(fn($g) => $g->first());
+    }
+
+    /**
+     * Total pagu & realisasi = jumlah nilai wakil tiap kode rekening.
      * $query adalah Eloquent builder yang sudah difilter (dicloning di dalam).
      */
     public static function budgetSums($query): array
     {
-        $byRek = (clone $query)->get(['account_code', 'budget_pagu', 'budget_realization'])
-            ->groupBy('account_code');
-        $pagu = $byRek->map(fn($g) => $g->pluck('budget_pagu')->unique()->sum())->sum();
-        $real = $byRek->map(fn($g) => $g->pluck('budget_realization')->unique()->sum())->sum();
+        $reps = self::representativePerRekening($query);
+        $pagu = $reps->sum(fn($a) => (float) $a->budget_pagu);
+        $real = $reps->sum(fn($a) => (float) $a->budget_realization);
         return ['pagu' => $pagu, 'realisasi' => $real, 'sisa' => $pagu - $real];
     }
 
     /**
-     * Peta sisa anggaran per kode rekening (akumulasi: pagu unik − realisasi unik).
+     * Peta sisa anggaran per kode rekening (pagu wakil − realisasi wakil).
      * Dipakai modul Kegiatan agar sisa yang tampil konsisten dengan Laporan.
      */
     public static function sisaPerRekening($query): array
     {
-        return (clone $query)->get(['account_code', 'budget_pagu', 'budget_realization'])
-            ->groupBy('account_code')
-            ->map(fn($g) => $g->pluck('budget_pagu')->unique()->sum()
-                - $g->pluck('budget_realization')->unique()->sum())
+        return self::representativePerRekening($query)
+            ->map(fn($a) => (float) $a->budget_pagu - (float) $a->budget_realization)
             ->toArray();
     }
 }

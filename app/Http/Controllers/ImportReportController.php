@@ -60,14 +60,18 @@ class ImportReportController extends Controller
         if ($request->filled('year')) $q->whereYear('activity_date', $request->year);
         // Catatan: rekap dihitung SEBELUM paginate karena paginate() menempelkan limit/offset ke query builder
         $sections = \App\Models\Section::orderBy('order')->get();
-        // Pagu & realisasi direkap per kode rekening TANPA menjumlahkan nilai yang sama
-        // (nilai yang tertera berulang di banyak baris dihitung 1x); kebutuhan dijumlahkan.
-        $perRekening = (clone $q)->get()->groupBy('account_code')->map(fn($g) => [
-            'code' => $g->first()->account_code, 'count' => $g->count(),
-            'pagu' => $g->pluck('budget_pagu')->unique()->sum(),
-            'realisasi' => $g->pluck('budget_realization')->unique()->sum(),
-            'kebutuhan' => $g->sum('requirement_qty'),
-        ])->values();
+        // Pagu & realisasi per kode rekening TANPA penjumlahan: diambil dari baris
+        // wakil (kegiatan paling awal); kebutuhan tetap dijumlahkan per kegiatan.
+        $perRekening = (clone $q)->orderBy('activity_date')->orderBy('id')->get()->groupBy('account_code')->map(function ($g, $code) {
+            $wakil = $g->first();
+            $pagu = (float) $wakil->budget_pagu;
+            $real = (float) $wakil->budget_realization;
+            return [
+                'code' => $code, 'count' => $g->count(),
+                'pagu' => $pagu, 'realisasi' => $real, 'sisa' => $pagu - $real,
+                'kebutuhan' => $g->sum('requirement_qty'),
+            ];
+        })->sortKeys()->values();
         $summary = [
             'pagu' => $perRekening->sum('pagu'),
             'realisasi' => $perRekening->sum('realisasi'),

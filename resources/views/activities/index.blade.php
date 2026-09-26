@@ -18,7 +18,7 @@
   <div class="bg-white rounded shadow p-3"><p class="text-xs text-slate-500">Total Jumlah (DPA)</p><p class="text-xl font-bold">{{ number_format($totals['jumlah'],0,',','.') }}</p></div>
 </div>
 <div class="bg-white rounded shadow p-3 mb-4 text-sm">
-  <h2 class="font-bold mb-2">Rincian Pagu per Kode Rekening <span class="text-xs font-normal text-slate-500">(kode yang sama digabung · mengikuti filter aktif)</span></h2>
+  <h2 class="font-bold mb-2">Rincian Pagu per Kode Rekening <span class="text-xs font-normal text-slate-500">(satu nilai per rekening = kegiatan paling awal · mengikuti filter aktif)</span></h2>
   <div class="overflow-x-auto">
   <table class="w-full text-sm">
     <thead class="bg-slate-100"><tr><th class="p-2 text-left">Kode Rekening</th><th class="p-2 text-center">Jml Kegiatan</th><th class="p-2 text-right">Total Pagu</th><th class="p-2 text-right">Realisasi</th><th class="p-2 text-right">Sisa</th></tr></thead>
