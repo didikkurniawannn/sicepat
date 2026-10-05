@@ -32,7 +32,7 @@ class GisController extends Controller
         $user = auth()->user();
         $focusKec = ($user && $user->kecamatan_id) ? Kecamatan::find($user->kecamatan_id) : null;
 
-        $indicators = Indicator::orderBy('name')->get();
+        $indicators = Indicator::orderBy('nama')->get();
         $indicator = $indicators->find($request->get('indicator_id'))
             ?? Indicator::where('kode', 'PEND_TOTAL')->first()
             ?? $indicators->first();

@@ -15,9 +15,10 @@
     <div class="hidden md:flex items-center gap-6 text-sm">
       <a href="#beranda" class="hover:text-yellow-300">Beranda</a>
       <a href="#modul" class="hover:text-yellow-300">Modul</a>
+      <a href="#sorotan" class="hover:text-yellow-300">Sorotan</a>
       <a href="#wilayah" class="hover:text-yellow-300">Wilayah</a>
       <a href="#fitur" class="hover:text-yellow-300">Fitur</a>
-      <a href="/pantau" class="hover:text-yellow-300">Pantauan</a>
+      <a href="#wilayah" class="hover:text-yellow-300">Pantauan</a>
       <a href="/login" class="bg-yellow-400 text-slate-900 font-semibold px-4 py-1.5 rounded-lg hover:bg-yellow-300">Masuk Aplikasi</a>
     </div>
     <button id="btnMenu" class="md:hidden text-2xl px-2" aria-label="Menu">☰</button>
@@ -25,9 +26,10 @@
   <div id="menuMobile" class="hidden md:hidden px-4 pb-4 flex flex-col gap-2 text-sm border-t border-slate-700">
     <a href="#beranda" class="py-1">Beranda</a>
     <a href="#modul" class="py-1">Modul</a>
+    <a href="#sorotan" class="py-1">Sorotan</a>
     <a href="#wilayah" class="py-1">Wilayah</a>
     <a href="#fitur" class="py-1">Fitur</a>
-    <a href="/pantau" class="py-1">Pantauan</a>
+    <a href="#wilayah" class="py-1">Pantauan</a>
     <a href="/login" class="bg-yellow-400 text-slate-900 font-semibold px-4 py-2 rounded-lg text-center">Masuk Aplikasi</a>
   </div>
 </nav>
@@ -36,28 +38,35 @@
 <header id="beranda" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-indigo-800 text-white overflow-hidden">
   <div class="max-w-7xl mx-auto px-4 py-14 md:py-24 grid md:grid-cols-2 gap-10 items-center">
     <div>
-      <span class="inline-block text-xs bg-yellow-400 text-slate-900 font-bold px-3 py-1 rounded-full mb-4">PORTAL RESMI KECAMATAN</span>
-      <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Satu Pintu<br>Layanan & Kinerja <span class="text-yellow-300">Kecamatan</span></h1>
-      <p class="mt-4 text-slate-300 text-sm md:text-base">Pantau kegiatan, percepatan anggaran, dan layanan kecamatan dalam satu genggaman — transparan untuk publik, praktis untuk aparatur.</p>
+      <span class="inline-block text-xs bg-yellow-400 text-slate-900 font-bold px-3 py-1 rounded-full mb-4">SUPER APPS · 31 KECAMATAN KAB. BANDUNG</span>
+      <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Satu Aplikasi<br>untuk Seluruh <span class="text-yellow-300">Kecamatan</span></h1>
+      <p class="mt-4 text-slate-300 text-sm md:text-base">Kinerja kegiatan, data sektoral, peta GIS, dan pantauan H-7 seluruh kecamatan dalam satu genggaman — transparan untuk publik, praktis untuk aparatur.</p>
       <div class="mt-6 flex flex-wrap gap-3">
         <a href="/login" class="bg-yellow-400 text-slate-900 font-bold px-6 py-2.5 rounded-xl hover:bg-yellow-300">Masuk Aplikasi →</a>
-        <a href="/pantau" class="border border-white/40 px-6 py-2.5 rounded-xl hover:bg-white/10">📊 Pantauan Publik</a>
+        <a href="#wilayah" class="border border-white/40 px-6 py-2.5 rounded-xl hover:bg-white/10">📊 Pantauan Publik</a>
       </div>
-      <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
-        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $totalKegiatan }}</p><p class="text-xs text-slate-300">Kegiatan Terpantau</p></div>
+      <div class="mt-8 grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
         <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $kecamatans->count() }}</p><p class="text-xs text-slate-300">Kecamatan</p></div>
-        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-red-300">{{ $h7 }}</p><p class="text-xs text-slate-300">H-7 ke Depan</p></div>
+        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $totalKegiatan }}</p><p class="text-xs text-slate-300">Kegiatan</p></div>
+        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-emerald-300">{{ $totalFasilitas }}</p><p class="text-xs text-slate-300">Fasilitas</p></div>
+        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-sky-300">{{ $totalDesa }}</p><p class="text-xs text-slate-300">Desa</p></div>
+        <div class="bg-white/10 rounded-xl p-3 col-span-2 sm:col-span-1"><p class="text-xl md:text-2xl font-extrabold text-red-300">{{ $h7 }}</p><p class="text-xs text-slate-300">H-7 ke Depan</p></div>
       </div>
     </div>
     <div class="hidden md:block">
       <div class="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10">
-        <p class="text-sm font-semibold text-yellow-300 mb-3">📅 Kalender & Pengingat H-7</p>
+        <p class="text-sm font-semibold text-yellow-300 mb-3">🔔 Live — Segera Berlangsung se-Kabupaten</p>
         <div class="space-y-2 text-sm">
-          <div class="bg-white text-slate-800 rounded-lg p-3 flex items-center gap-3"><span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded">H-3</span><span>Rapat koordinasi unit kerja</span></div>
-          <div class="bg-white text-slate-800 rounded-lg p-3 flex items-center gap-3"><span class="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded">✓</span><span class="line-through opacity-70">Monitoring evaluasi desa</span></div>
-          <div class="bg-white text-slate-800 rounded-lg p-3 flex items-center gap-3"><span class="bg-slate-500 text-white text-xs font-bold px-2 py-0.5 rounded">H-7</span><span>Sosialisasi program kecamatan</span></div>
+          @forelse($sorotan->take(3) as $s)
+          <a href="/pantau/{{ $s->kecamatan->slug ?? 'cangkuang' }}" class="block bg-white text-slate-800 rounded-lg p-3 flex items-center gap-3 hover:bg-yellow-50">
+            <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded whitespace-nowrap">H-{{ $s->days_to_event }}</span>
+            <span class="truncate">{{ $s->title }} <span class="text-slate-400 text-xs">· {{ $s->kecamatan->name ?? '' }}</span></span>
+          </a>
+          @empty
+          <p class="text-slate-300 text-sm">Tidak ada kegiatan 7 hari ke depan. 🎉</p>
+          @endforelse
         </div>
-        <p class="text-xs text-slate-400 mt-4">Contoh tampilan — <a href="/pantau" class="text-yellow-300 underline">buka pantauan live →</a></p>
+        <p class="text-xs text-slate-400 mt-4">Data live — <a href="#sorotan" class="text-yellow-300 underline">lihat semua sorotan →</a></p>
       </div>
     </div>
   </div>
@@ -73,7 +82,7 @@
       <h3 class="font-bold mt-2">SiCepatKeg</h3>
       <p class="text-xs text-slate-500 mt-1 flex-1">Percepatan kinerja & kegiatan: kalender H-7, verifikasi berjenjang, laporan realisasi anggaran.</p>
       <div class="mt-4 flex gap-2 text-sm">
-        <a href="/pantau" class="flex-1 text-center bg-indigo-600 text-white px-3 py-1.5 rounded-lg">Pantau</a>
+        <a href="#wilayah" class="flex-1 text-center bg-indigo-600 text-white px-3 py-1.5 rounded-lg">Pantau</a>
         <a href="/login" class="flex-1 text-center bg-slate-900 text-white px-3 py-1.5 rounded-lg">Masuk</a>
       </div>
     </div>
@@ -101,18 +110,39 @@
   </div>
 </section>
 
+<!-- SOROTAN GLOBAL -->
+<section id="sorotan" class="bg-white border-y">
+  <div class="max-w-7xl mx-auto px-4 py-14">
+    <h2 class="text-2xl md:text-3xl font-extrabold text-center">Sorotan se-Kabupaten</h2>
+    <p class="text-center text-slate-500 text-sm mt-1 mb-8">Kegiatan 7 hari ke depan dari seluruh kecamatan — klik untuk pantauan wilayahnya.</p>
+    <div class="flex gap-3 overflow-x-auto pb-2">
+      @forelse($sorotan as $s)
+      <a href="/pantau/{{ $s->kecamatan->slug ?? 'cangkuang' }}" class="min-w-[240px] max-w-[240px] bg-slate-50 border rounded-2xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition">
+        <span class="text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded">H-{{ $s->days_to_event }} · {{ $s->activity_date->translatedFormat('d F Y') }}</span>
+        <p class="font-bold text-sm mt-2 line-clamp-2">{{ $s->title }}</p>
+        <p class="text-xs text-slate-500 mt-1">🏘️ {{ $s->kecamatan->name ?? '-' }} · {{ $s->section->short_name ?? '' }}</p>
+      </a>
+      @empty
+      <p class="text-slate-500 text-sm">Tidak ada kegiatan dalam 7 hari ke depan. 🎉</p>
+      @endforelse
+    </div>
+  </div>
+</section>
+
 <!-- WILAYAH -->
 <section id="wilayah" class="max-w-7xl mx-auto px-4 py-14">
   <h2 class="text-2xl md:text-3xl font-extrabold text-center">Pantauan per Kecamatan</h2>
-  <p class="text-center text-slate-500 text-sm mt-1 mb-8">Pilih kecamatan untuk melihat kalender & pengingat kegiatan — tanpa login, tanpa data nominal.</p>
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+  <p class="text-center text-slate-500 text-sm mt-1 mb-4">Pilih kecamatan untuk melihat kalender & pengingat kegiatan — tanpa login, tanpa data nominal.</p>
+  <div class="max-w-md mx-auto mb-8"><input id="cariWilayah" placeholder="🔍 Cari kecamatan..." class="w-full border rounded-xl px-4 py-2 text-sm shadow-sm"></div>
+  <div id="gridWilayah" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
     @foreach($kecamatans as $k)
-    <a href="/pantau/{{ $k->slug }}" class="bg-white rounded-xl shadow p-4 hover:shadow-lg hover:-translate-y-0.5 transition text-center">
+    <a href="/pantau/{{ $k->slug }}" data-nama="{{ strtolower($k->name) }}" class="kartu-wilayah bg-white rounded-xl shadow p-4 hover:shadow-lg hover:-translate-y-0.5 transition text-center">
       <p class="font-bold text-sm">🏘️ {{ $k->name }}</p>
       <p class="text-xs text-blue-700 mt-1">Buka pantauan →</p>
     </a>
     @endforeach
   </div>
+  <p id="wilayahKosong" class="hidden text-center text-slate-500 text-sm mt-4">Tidak ada kecamatan yang cocok.</p>
 </section>
 
 <!-- FITUR -->
@@ -136,6 +166,16 @@
 <script>
 document.getElementById('btnMenu').addEventListener('click', () => {
   document.getElementById('menuMobile').classList.toggle('hidden');
+});
+document.getElementById('cariWilayah').addEventListener('input', function(){
+  const q = this.value.toLowerCase();
+  let n = 0;
+  document.querySelectorAll('.kartu-wilayah').forEach(el => {
+    const cocok = el.dataset.nama.includes(q);
+    el.classList.toggle('hidden', !cocok);
+    if (cocok) n++;
+  });
+  document.getElementById('wilayahKosong').classList.toggle('hidden', n > 0);
 });
 </script>
 </body>
