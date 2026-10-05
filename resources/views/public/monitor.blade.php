@@ -19,9 +19,12 @@
 <header class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
   <div>
     <span class="font-bold text-lg">🏛️ {{ config('app.name') }}</span>
-    <span class="text-xs text-slate-300 ml-2">Pantauan Kegiatan — tanpa login · data per {{ now()->translatedFormat('d F Y H:i') }} WIB · refresh otomatis 5 menit</span>
+    <span class="text-xs text-slate-300 ml-2">Pantauan {{ $kecamatan->name }} — tanpa login · data per {{ now()->translatedFormat('d F Y H:i') }} WIB · refresh otomatis 5 menit</span>
   </div>
-  <a href="/login" class="bg-yellow-400 text-slate-900 text-sm font-semibold px-3 py-1 rounded">Login Petugas</a>
+  <div class="flex gap-2">
+    <a href="/#wilayah" class="text-sm px-3 py-1 rounded border border-white/40 hover:bg-white/10">Ganti Kecamatan</a>
+    <a href="/login" class="bg-yellow-400 text-slate-900 text-sm font-semibold px-3 py-1 rounded">Login Petugas</a>
+  </div>
 </header>
 
 <main class="max-w-7xl mx-auto p-4 space-y-6">
@@ -42,7 +45,7 @@
           <span class="font-semibold">{{ $a->activity_date->translatedFormat('d F Y') }}</span>
           @if($a->is_h7)<span class="text-xs bg-red-600 text-white px-1 rounded">H-{{ $a->days_to_event }}</span>@endif
           <br>{{ $a->title }}
-          <br><span class="text-xs text-slate-500">{{ $a->section->name }} · Rp {{ number_format($a->budget_pagu,0,',','.') }}</span>
+          <br><span class="text-xs text-slate-500">{{ $a->section->name }} · {{ $a->requirement_qty }}/{{ $a->total_qty }} {{ $a->unit }}</span>
           <span class="text-xs px-1 rounded {{ $a->status === 'selesai' ? 'bg-green-600 text-white' : 'bg-slate-200' }}">{{ $a->status === 'selesai' ? '✓ ' : '' }}{{ $a->status }}</span>
         </li>
         @empty
@@ -76,8 +79,6 @@
         <p class="text-xs text-slate-500">{{ $s->code }} · {{ $s->type }} · Ka. Unit: {{ $s->head_name ?? '-' }}</p>
         <p class="mt-2 text-2xl font-bold">{{ $s->activity_count }} <span class="text-xs font-normal text-slate-500">kegiatan</span></p>
         <p class="text-xs">7 hari ke depan: <span class="font-bold {{ $s->upcoming7 ? 'text-red-600' : '' }}">{{ $s->upcoming7 }}</span></p>
-        <p class="text-xs">Pagu Rp {{ number_format($s->total_pagu,0,',','.') }}</p>
-        <p class="text-xs text-green-700">Realisasi Rp {{ number_format($s->total_realisasi,0,',','.') }}</p>
       </div>
       @endforeach
     </div>
@@ -96,7 +97,6 @@
 <footer class="text-center text-xs text-slate-500 py-6">© 2026 {{ config('app.name') }} — Halaman pantauan publik, dapat diakses tanpa login</footer>
 
 <script>
-const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');
 const tip = document.getElementById('tooltip');
 
 function tipHtml(p) {
@@ -104,7 +104,7 @@ function tipHtml(p) {
     <p>📅 ${p.tanggal} ${p.is_h7 ? '· ⚠ H-' + p.days : ''}</p>
     <p>🏢 ${p.bidang} · <span class="${p.status === 'selesai' ? 'bg-green-600' : 'bg-slate-700'} px-1 rounded">${p.status === 'selesai' ? '✓ selesai' : p.status}</span>${p.is_past && p.status !== 'selesai' ? ' · <span class="text-slate-400">terlewati</span>' : ''}</p>
     <p class="mt-1 text-slate-300">${p.kode_rekening}</p>
-    <p>Pagu ${fmt(p.pagu)} · Realisasi ${fmt(p.realisasi)} · Sisa ${fmt(p.sisa)}</p>
+    <p>Kebutuhan ${p.kebutuhan}</p>
     <p class="text-slate-400 mt-1">Sorot = ringkas · Klik = rincian penuh</p>`;
 }
 
@@ -118,10 +118,7 @@ function modalHtml(p) {
       <tr class="border-t"><td class="py-1 text-slate-500">Kode Rekening</td><td class="font-mono">${p.kode_rekening}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Program</td><td>${p.program}</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Kebutuhan</td><td>${p.kebutuhan}</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">Pagu</td><td>${fmt(p.pagu)}</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">Realisasi</td><td>${fmt(p.realisasi)}</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">Sisa</td><td class="font-bold">${fmt(p.sisa)}</td></tr>
-      <tr class="border-t"><td class="py-1 text-slate-500">Status / Progress</td><td>${p.status} · ${p.progress}%</td></tr>
+      <tr class="border-t"><td class="py-1 text-slate-500">Status / Progress</td><td>${p.status === 'selesai' ? '✓ ' : ''}${p.status} · ${p.progress}%</td></tr>
       <tr class="border-t"><td class="py-1 text-slate-500">Lokasi / Penanggung Jawab</td><td>${p.lokasi} / ${p.pptk}</td></tr>
     </table>`;
 }
@@ -142,7 +139,7 @@ const calendar = new FullCalendar.Calendar(document.getElementById('cal'), {
     }
   },
   events: function(info, success, failure){
-    fetch('/api/pantau/events?section_id=' + document.getElementById('fSection').value)
+    fetch('/api/pantau/{{ $kecamatan->slug }}/events?section_id=' + document.getElementById('fSection').value)
       .then(r => r.json()).then(success).catch(failure);
   },
   eventMouseEnter: function(info){

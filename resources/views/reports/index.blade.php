@@ -11,6 +11,9 @@
 </div>
 <form class="bg-white rounded shadow p-3 flex flex-wrap gap-2 text-sm mb-4" method="GET">
   <select name="section_id" class="border rounded px-2 py-1"><option value="">Semua Unit</option>@foreach($sections as $s)<option value="{{ $s->id }}" @selected(request('section_id')==$s->id)>{{ $s->name }}</option>@endforeach</select>
+  @if(!empty($kecamatans))
+  <select name="kecamatan_id" class="border rounded px-2 py-1"><option value="">Semua Kecamatan</option>@foreach($kecamatans as $k)<option value="{{ $k->id }}" @selected(request('kecamatan_id')==$k->id)>{{ $k->name }}</option>@endforeach</select>
+  @endif
   <select name="status" class="border rounded px-2 py-1"><option value="">Semua Status</option>@foreach(['draft','diajukan','diverifikasi','disetujui','berjalan','selesai','ditolak'] as $st)<option @selected(request('status')==$st)>{{ $st }}</option>@endforeach</select>
   <input name="month" type="number" min="1" max="12" value="{{ request('month') }}" placeholder="Bulan" class="border rounded px-2 py-1 w-24">
   <input name="year" type="number" value="{{ request('year') }}" placeholder="Tahun" class="border rounded px-2 py-1 w-24">

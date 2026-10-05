@@ -3,38 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\Kecamatan;
 use App\Models\Section;
 use Illuminate\Http\Request;
 
 class PublicMonitorController extends Controller
 {
-    public function index()
+    private function tenant(string $slug): Kecamatan
     {
-        $sections = Section::active()->orderBy('order')->get()->map(function ($s) {
-            $qq = Activity::where('section_id', $s->id);
+        return Kecamatan::active()->where('slug', $slug)->firstOrFail();
+    }
+
+    public function index(string $slug)
+    {
+        $kecamatan = $this->tenant($slug);
+        $sections = Section::active()->orderBy('order')->get()->map(function ($s) use ($kecamatan) {
+            $qq = Activity::where('section_id', $s->id)->where('kecamatan_id', $kecamatan->id);
             $s->activity_count = (clone $qq)->count();
-            $ss = Activity::budgetSums($qq);
-            $s->total_pagu = $ss['pagu'];
-            $s->total_realisasi = $ss['realisasi'];
-            $s->upcoming7 = Activity::where('section_id', $s->id)->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])->count();
+            $s->upcoming7 = (clone $qq)->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])->count();
             return $s;
         });
 
         $upcoming7 = Activity::with(['section','pptk'])
+            ->where('kecamatan_id', $kecamatan->id)
             ->whereBetween('activity_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->orderBy('activity_date')->get();
 
-        $total = Activity::count();
-        $totalH7 = $upcoming7->count();
+        $total = Activity::where('kecamatan_id', $kecamatan->id)->count();
 
-        return view('public.monitor', compact('sections','upcoming7','total','totalH7'));
+        return view('public.monitor', [
+            'kecamatan' => $kecamatan, 'sections' => $sections,
+            'upcoming7' => $upcoming7, 'total' => $total, 'totalH7' => $upcoming7->count(),
+        ]);
     }
 
-    public function events(Request $request)
+    public function events(Request $request, string $slug)
     {
-        $q = Activity::with(['section','pptk']);
+        $kecamatan = $this->tenant($slug);
+        $q = Activity::with(['section','pptk'])->where('kecamatan_id', $kecamatan->id);
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
 
+        // Nominal (pagu/realisasi/sisa) SENGAJA tidak dikirim ke publik
         return $q->orderBy('activity_date')->get()->map(function ($a) {
             $days = $a->days_to_event;
             $isH7 = $a->is_h7;
@@ -53,9 +62,6 @@ class PublicMonitorController extends Controller
                     'kode_rekening' => $a->account_code,
                     'program' => $a->program_name,
                     'kebutuhan' => $a->requirement_qty.' / '.$a->total_qty.' '.$a->unit,
-                    'pagu' => (float) $a->budget_pagu,
-                    'realisasi' => (float) $a->budget_realization,
-                    'sisa' => (float) $a->budget_pagu - (float) $a->budget_realization,
                     'status' => $a->status,
                     'progress' => $a->progress,
                     'lokasi' => $a->location ?? '-',

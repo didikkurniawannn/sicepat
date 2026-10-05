@@ -10,17 +10,30 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        // Daftar akun login per peran agar tiap user langsung tahu emailnya (dinamis dari database)
+        $kecamatans = \App\Models\Kecamatan::active()->orderBy('order')->get();
+        return view('auth.login', compact('kecamatans'));
+    }
+
+    /** Daftar akun login per kecamatan (publik, tanpa password) agar Kasi langsung tahu emailnya */
+    public function loginAccounts(Request $request)
+    {
+        $request->validate(['kecamatan' => 'required|string']);
+        $kec = \App\Models\Kecamatan::active()->where('slug', $request->kecamatan)->first();
+        if (!$kec) return response()->json([]);
         try {
-            $adminUsers = \App\Models\User::role('admin')->get();
-            $kasiUsers = \App\Models\User::role('kasi')->with('section')->get()
-                ->sortBy(fn($u) => $u->section->order ?? 99)->values();
-            $stafUsers = \App\Models\User::role('staf')->with('section')->get()
-                ->sortBy(fn($u) => $u->section->order ?? 99)->values();
+            $users = \App\Models\User::with('section')->where('kecamatan_id', $kec->id)
+                ->whereHas('roles', fn($qq) => $qq->whereIn('name', ['admin', 'kasi', 'staf']))
+                ->get()->sortBy(fn($u) => ($u->getRoleNames()->first() === 'admin' ? 0 : ($u->getRoleNames()->first() === 'kasi' ? 1 : 2)) * 100 + ($u->section->order ?? 99))
+                ->values()->map(fn($u) => [
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'role' => $u->getRoleNames()->first(),
+                    'section' => $u->section->name ?? '-',
+                ]);
+            return response()->json($users);
         } catch (\Throwable $e) {
-            $adminUsers = $kasiUsers = $stafUsers = collect();
+            return response()->json([]);
         }
-        return view('auth.login', compact('adminUsers', 'kasiUsers', 'stafUsers'));
     }
 
     public function login(Request $request)

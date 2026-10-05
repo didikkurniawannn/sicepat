@@ -22,6 +22,9 @@
 </div>
 <form class="bg-white rounded shadow p-3 flex flex-wrap gap-2 text-sm mb-4 no-print" method="GET">
   <select name="section_id" class="border rounded px-2 py-1"><option value="">Semua Unit</option>@foreach($sections as $s)<option value="{{ $s->id }}" @selected(request('section_id')==$s->id)>{{ $s->name }}</option>@endforeach</select>
+  @if(!empty($kecamatans))
+  <select name="kecamatan_id" class="border rounded px-2 py-1"><option value="">Semua Kecamatan</option>@foreach($kecamatans as $k)<option value="{{ $k->id }}" @selected(request('kecamatan_id')==$k->id)>{{ $k->name }}</option>@endforeach</select>
+  @endif
   <button class="bg-blue-600 text-white px-3 py-1 rounded">Filter</button>
   <a href="/laporan" class="bg-slate-200 px-3 py-1 rounded">← Laporan Umum</a>
 </form>

@@ -4,7 +4,12 @@
 <h1 class="text-xl font-bold mb-3">Import Data Kegiatan.xlsx</h1>
 <div class="bg-white rounded shadow p-4 mb-4 text-sm">
   <p class="mb-2">Format kolom: Bulan | Bidang | Kode Rekening | Kegiatan | Judul Kegiatan | Kebutuhan Kegiatan | Jumlah | Satuan | Pagu | Realisasi | Sisa. <a href="/import/template" class="text-blue-700 underline">Unduh template</a></p>
-  <form action="/import/preview" method="POST" enctype="multipart/form-data" class="flex gap-2">@csrf<input type="file" name="file" accept=".xlsx,.xls,.csv" required><button class="bg-slate-900 text-white px-3 py-1 rounded">Upload & Preview</button></form>
+  <form action="/import/preview" method="POST" enctype="multipart/form-data" class="flex flex-wrap gap-2 items-center">@csrf<input type="file" name="file" accept=".xlsx,.xls,.csv" required>
+  @if(!empty($kecamatans))
+  <select name="kecamatan_id" required class="border rounded px-2 py-1"><option value="">— Kecamatan tujuan —</option>@foreach($kecamatans as $k)<option value="{{ $k->id }}">{{ $k->name }}</option>@endforeach</select>
+  @endif
+  <button class="bg-slate-900 text-white px-3 py-1 rounded">Upload & Preview</button></form>
+  @if(empty($kecamatans))<p class="text-xs text-slate-500 mt-1">Data masuk ke: {{ auth()->user()->kecamatan->name ?? '-' }}</p>@endif
 </div>
 <h2 class="font-semibold mb-2">Log Import</h2>
 <div class="bg-white rounded shadow p-3 text-sm space-y-2">

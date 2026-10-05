@@ -14,19 +14,31 @@
   </form>
   <a href="/pantau" class="block text-center text-sm text-blue-700 hover:underline mt-3">📊 Lihat Pantauan Kegiatan (tanpa login)</a>
   <div class="mt-6 text-xs bg-slate-50 border rounded p-3">
-    <p class="font-semibold mb-1">💡 Cara masuk: ketik email sesuai nama & unit kerja Anda + password <code class="bg-slate-200 px-1 rounded">password123</code></p>
-    <ul class="space-y-1 text-slate-600 mt-2">
-      @foreach($adminUsers as $a)
-      <li><span class="font-semibold text-slate-800">👑 {{ $a->name }}</span><br><span class="font-mono">{{ $a->email }}</span></li>
-      @endforeach
-      @foreach($kasiUsers as $k)
-      <li><span class="font-semibold text-slate-800">📋 {{ $k->name }}{{ $k->section ? ' — '.$k->section->name : '' }}</span><br><span class="font-mono">{{ $k->email }}</span></li>
-      @endforeach
-      @foreach($stafUsers as $s)
-      <li><span class="font-semibold text-slate-800">🧑‍💼 {{ $s->name }}</span><br><span class="font-mono">{{ $s->email }}</span></li>
-      @endforeach
-    </ul>
+    <p class="font-semibold mb-1">💡 Cara masuk tanpa panduan:</p>
+    <ol class="list-decimal ml-4 space-y-0.5 text-slate-600 mb-2">
+      <li>Pilih kecamatan Anda.</li>
+      <li>Ketik email sesuai nama & unit kerja + password <code class="bg-slate-200 px-1 rounded">password123</code>.</li>
+    </ol>
+    <select id="pilihKecamatan" class="w-full border rounded px-2 py-1.5 mb-2 text-slate-800">
+      <option value="">— Pilih kecamatan —</option>
+      @foreach($kecamatans as $k)<option value="{{ $k->slug }}">{{ $k->name }}</option>@endforeach
+    </select>
+    <ul id="daftarAkun" class="space-y-1 text-slate-600"><li class="text-slate-400">Pilih kecamatan untuk melihat daftar akun.</li></ul>
   </div>
 </div>
+<script>
+document.getElementById('pilihKecamatan').addEventListener('change', function(){
+  const box = document.getElementById('daftarAkun');
+  if (!this.value) { box.innerHTML = '<li class="text-slate-400">Pilih kecamatan untuk melihat daftar akun.</li>'; return; }
+  box.innerHTML = '<li class="text-slate-400">Memuat...</li>';
+  fetch('/api/login-accounts?kecamatan=' + this.value).then(r => r.json()).then(data => {
+    if (!data.length) { box.innerHTML = '<li class="text-slate-400">Belum ada akun di kecamatan ini.</li>'; return; }
+    const ikon = {admin: '👑', kasi: '📋', staf: '🧑‍💼'};
+    box.innerHTML = data.map(u =>
+      `<li><span class="font-semibold text-slate-800">${ikon[u.role] || '👤'} ${u.name} <span class="font-normal text-slate-500">(${u.section})</span></span><br><span class="font-mono">${u.email}</span></li>`
+    ).join('');
+  });
+});
+</script>
 </body>
 </html>

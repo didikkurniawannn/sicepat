@@ -9,12 +9,16 @@ use App\Http\Controllers\InstallerController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicMonitorController;
 use App\Http\Controllers\SectionUserController;
+use App\Http\Controllers\TenantController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
-Route::get('/pantau', [PublicMonitorController::class, 'index'])->name('pantau');
-Route::get('/api/pantau/events', [PublicMonitorController::class, 'events']);
+// Pantauan publik per kecamatan (tanpa nominal) — /pantau lama dialihkan ke direktori wilayah
+Route::get('/pantau', fn() => redirect('/#wilayah'));
+Route::get('/pantau/{slug}', [PublicMonitorController::class, 'index'])->name('pantau');
+Route::get('/api/pantau/{slug}/events', [PublicMonitorController::class, 'events']);
+Route::get('/api/login-accounts', [AuthController::class, 'loginAccounts']);
 
 // Installer (diproteksi token, otomatis nonaktif setelah sukses)
 Route::get('/install', [InstallerController::class, 'index']);
@@ -62,6 +66,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/pengguna', [SectionUserController::class, 'users']);
     Route::post('/pengguna', [SectionUserController::class, 'usersStore']);
+
+    Route::get('/kecamatan', [TenantController::class, 'index']);
+    Route::post('/kecamatan', [TenantController::class, 'store']);
+    Route::post('/kecamatan/{kecamatan}/toggle', [TenantController::class, 'toggle']);
 
     Route::get('/notifikasi', [SectionUserController::class, 'notifications']);
 });

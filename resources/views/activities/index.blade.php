@@ -8,6 +8,9 @@
 <form class="bg-white rounded shadow p-3 grid md:grid-cols-6 gap-2 mb-4 text-sm" method="GET">
   <input name="search" value="{{ request('search') }}" placeholder="Cari judul/program/rekening..." class="border rounded px-2 py-1 md:col-span-2">
   <select name="section_id" class="border rounded px-2 py-1"><option value="">Semua Unit</option>@foreach($sections as $s)<option value="{{ $s->id }}" @selected(request('section_id')==$s->id)>{{ $s->name }}</option>@endforeach</select>
+  @if(!empty($kecamatans))
+  <select name="kecamatan_id" class="border rounded px-2 py-1"><option value="">Semua Kecamatan</option>@foreach($kecamatans as $k)<option value="{{ $k->id }}" @selected(request('kecamatan_id')==$k->id)>{{ $k->name }}</option>@endforeach</select>
+  @endif
   <select name="status" class="border rounded px-2 py-1"><option value="">Semua Status</option>@foreach($statuses as $st)<option @selected(request('status')==$st)>{{ $st }}</option>@endforeach</select>
   <input name="month" type="number" min="1" max="12" value="{{ request('month') }}" placeholder="Bulan" class="border rounded px-2 py-1">
   <input name="year" type="number" value="{{ request('year') }}" placeholder="Tahun" class="border rounded px-2 py-1">

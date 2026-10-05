@@ -17,6 +17,10 @@ class DashboardController extends Controller
             if ($user->hasAnyRole(['kasi','staf'])) {
             $q->where('section_id', $user->section_id);
         }
+        // Multi-tenant: selain superadmin hanya melihat data kecamatannya sendiri
+        if (!$user->isSuperAdmin() && $user->kecamatan_id) {
+            $q->where('activities.kecamatan_id', $user->kecamatan_id);
+        }
 
         $all = (clone $q)->get();
         $total = $all->count();
@@ -35,6 +39,9 @@ class DashboardController extends Controller
 
         $perSection = Section::active()->orderBy('order')->get()->map(function ($s) use ($user) {
             $qq = Activity::where('section_id', $s->id);
+            if (!$user->isSuperAdmin() && $user->kecamatan_id) {
+                $qq->where('activities.kecamatan_id', $user->kecamatan_id);
+            }
         if ($user->hasAnyRole(['kasi','staf'])) {
                 if ($s->id !== $user->section_id) return null;
             }

@@ -15,8 +15,15 @@ class ActivitiesImport implements ToCollection, WithHeadingRow
     public array $errors = [];
     public int $success = 0;
 
+    public function __construct(public ?int $kecamatanId = null) {}
+
     public function collection(Collection $rows)
     {
+        $kecamatanId = $this->kecamatanId ?? auth()->user()?->kecamatan_id;
+        if (!$kecamatanId) {
+            $this->errors[] = 'Kecamatan tujuan tidak diketahui (akun tanpa kecamatan).';
+            return;
+        }
         $secByName = Section::all()->keyBy('name');
         foreach ($rows as $i => $row) {
             $line = $i + 2;
@@ -37,7 +44,7 @@ class ActivitiesImport implements ToCollection, WithHeadingRow
                 if ($tot < $req) { $this->errors[] = "Baris $line: Jumlah < Kebutuhan."; continue; }
 
                 Activity::updateOrCreate(
-                    ['account_code' => $row['kode_rekening'], 'title' => $row['judul_kegiatan'], 'activity_date' => $date],
+                    ['account_code' => $row['kode_rekening'], 'title' => $row['judul_kegiatan'], 'activity_date' => $date, 'kecamatan_id' => $kecamatanId],
                     [
                         'section_id' => $section->id,
                         'program_name' => $row['kegiatan'] ?? '-',

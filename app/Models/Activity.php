@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Activity extends Model
 {
     protected $fillable = [
-        'activity_date','section_id','account_code','program_name','title',
+        'activity_date','section_id','kecamatan_id','account_code','program_name','title',
         'requirement_qty','total_qty','unit','budget_pagu','budget_realization',
         'location','pptk_id','status','progress','description','created_by',
     ];
@@ -46,6 +46,7 @@ class Activity extends Model
     }
 
     public function section(): BelongsTo { return $this->belongsTo(Section::class); }
+    public function kecamatan(): BelongsTo { return $this->belongsTo(Kecamatan::class); }
     public function pptk(): BelongsTo { return $this->belongsTo(User::class, 'pptk_id'); }
     public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
     public function documents(): HasMany { return $this->hasMany(ActivityDocument::class); }

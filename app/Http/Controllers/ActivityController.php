@@ -21,6 +21,13 @@ class ActivityController extends Controller
         if ($user->hasAnyRole(['kasi','staf']) && $user->section_id) {
             $q->where('section_id', $user->section_id);
         }
+        // Multi-tenant: selain superadmin hanya data kecamatannya; superadmin boleh filter kecamatan
+        if (!$user->isSuperAdmin() && $user->kecamatan_id) {
+            $q->where('activities.kecamatan_id', $user->kecamatan_id);
+        }
+        if ($user->isSuperAdmin() && $request->filled('kecamatan_id')) {
+            $q->where('activities.kecamatan_id', $request->kecamatan_id);
+        }
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
         if ($request->filled('status')) $q->where('status', $request->status);
         if ($request->filled('month')) $q->whereMonth('activity_date', $request->month);
@@ -56,23 +63,32 @@ class ActivityController extends Controller
         $activities = $q->paginate(15)->withQueryString();
         $sections = Section::active()->orderBy('order')->get();
         $statuses = ['draft','diajukan','diverifikasi','disetujui','berjalan','selesai','ditolak'];
+        $kecamatans = $user->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
 
-        return view('activities.index', compact('activities','sections','statuses','totals','perRekening'));
+        return view('activities.index', compact('activities','sections','statuses','totals','perRekening','kecamatans'));
     }
 
     public function create()
     {
         $this->authorizeInput();
+        $user = auth()->user();
         $sections = Section::active()->orderBy('order')->get();
-        $pptks = User::role('kasi')->with('section')->get();
-        return view('activities.form', ['activity' => new Activity(), 'sections' => $sections, 'pptks' => $pptks]);
+        $pptks = User::role('kasi')->with('section')
+            ->when(!$user->isSuperAdmin() && $user->kecamatan_id, fn($qq) => $qq->where('kecamatan_id', $user->kecamatan_id))
+            ->get();
+        $kecamatans = $user->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
+        return view('activities.form', ['activity' => new Activity(), 'sections' => $sections, 'pptks' => $pptks, 'kecamatans' => $kecamatans]);
     }
 
     public function store(Request $request)
     {
         $this->authorizeInput();
+        $user = auth()->user();
         $data = $this->validated($request);
-        $data['created_by'] = auth()->id();
+        $data['created_by'] = $user->id;
+        $data['kecamatan_id'] = $user->isSuperAdmin()
+            ? $request->validate(['kecamatan_id' => 'required|exists:kecamatans,id'])['kecamatan_id']
+            : $user->kecamatan_id;
         $act = Activity::create($data);
         $this->syncChecklist($act, $request);
         ActivityLog::create(['user_id' => auth()->id(), 'action' => 'create_activity', 'model_type' => Activity::class, 'model_id' => $act->id, 'description' => "Input kegiatan: {$act->title}"]);
@@ -81,6 +97,7 @@ class ActivityController extends Controller
 
     public function show(Activity $activity)
     {
+        $this->authorizeTenant($activity);
         $activity->load(['section','pptk','documents','checklists','verifications.user']);
         return view('activities.show', compact('activity'));
     }
@@ -88,15 +105,22 @@ class ActivityController extends Controller
     public function edit(Activity $activity)
     {
         $this->authorizeInput($activity);
+        $user = auth()->user();
         $sections = Section::active()->orderBy('order')->get();
-        $pptks = User::role('kasi')->with('section')->get();
-        return view('activities.form', ['activity' => $activity, 'sections' => $sections, 'pptks' => $pptks]);
+        $pptks = User::role('kasi')->with('section')
+            ->when(!$user->isSuperAdmin() && $user->kecamatan_id, fn($qq) => $qq->where('kecamatan_id', $user->kecamatan_id))
+            ->get();
+        $kecamatans = $user->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
+        return view('activities.form', ['activity' => $activity, 'sections' => $sections, 'pptks' => $pptks, 'kecamatans' => $kecamatans]);
     }
 
     public function update(Request $request, Activity $activity)
     {
         $this->authorizeInput($activity);
         $data = $this->validated($request, $activity->id);
+        if (auth()->user()->isSuperAdmin() && $request->filled('kecamatan_id')) {
+            $data['kecamatan_id'] = $request->validate(['kecamatan_id' => 'exists:kecamatans,id'])['kecamatan_id'];
+        }
         $activity->update($data);
         $this->syncChecklist($act = $activity, $request);
         ActivityLog::create(['user_id' => auth()->id(), 'action' => 'update_activity', 'model_type' => Activity::class, 'model_id' => $activity->id, 'description' => "Update kegiatan: {$activity->title}"]);
@@ -113,14 +137,16 @@ class ActivityController extends Controller
 
     public function ajukan(Activity $activity)
     {
+        $this->authorizeTenant($activity);
         $activity->update(['status' => 'diajukan']);
         Verification::create(['activity_id' => $activity->id, 'user_id' => auth()->id(), 'role_at_time' => auth()->user()->getRoleNames()->first() ?? '-', 'decision' => 'diajukan', 'note' => 'Diajukan untuk verifikasi']);
-        $this->notifyRole('admin', 'Pengajuan baru perlu diverifikasi', $activity->title, $activity->id);
+        $this->notifyRole('admin', 'Pengajuan baru perlu diverifikasi', $activity->title, $activity->id, $activity->kecamatan_id);
         return back()->with('success', 'Kegiatan diajukan untuk verifikasi.');
     }
 
     public function updateProgress(Request $request, Activity $activity)
     {
+        $this->authorizeTenant($activity);
         // Realisasi dibandingkan ke pagu milik kegiatan (form tidak mengirim budget_pagu)
         $request->validate([
             'progress' => 'required|integer|min:0|max:100',
@@ -157,6 +183,7 @@ class ActivityController extends Controller
 
     public function uploadDoc(Request $request, Activity $activity)
     {
+        $this->authorizeTenant($activity);
         $request->validate(['name' => 'required|string|max:255', 'type' => 'required|string|max:30', 'file' => 'required|file|max:10240']);
         $path = $request->file('file')->store('docs', 'public');
         $activity->documents()->create(['name' => $request->name, 'type' => $request->type, 'file_path' => $path, 'uploaded_by' => auth()->id()]);
@@ -198,22 +225,33 @@ class ActivityController extends Controller
         }
     }
 
+    private function authorizeTenant($activity): void
+    {
+        $user = auth()->user();
+        if ($user->isSuperAdmin()) return;
+        abort_unless($activity->kecamatan_id && (int) $activity->kecamatan_id === (int) $user->kecamatan_id, 403, 'Data kecamatan lain.');
+    }
+
     private function authorizeInput($activity = null)
     {
         $user = auth()->user();
         abort_unless($user->hasAnyRole(['admin','kasi']), 403, 'Hanya Admin/Kasi yang dapat input kegiatan.');
-        if ($activity && $user->hasRole('kasi') && $activity->section_id !== $user->section_id) {
-            abort(403, 'Kasi hanya dapat mengelola unit sendiri.');
+        if ($activity) {
+            $this->authorizeTenant($activity);
+            if ($user->hasRole('kasi') && $activity->section_id !== $user->section_id) {
+                abort(403, 'Kasi hanya dapat mengelola unit sendiri.');
+            }
         }
         if (!$activity && $user->hasRole('kasi') && request('section_id') && (int) request('section_id') !== (int) $user->section_id) {
             abort(403, 'Kasi hanya dapat input untuk unit sendiri.');
         }
     }
 
-    private function notifyRole(string $role, string $title, string $msg, $activityId)
+    private function notifyRole(string $role, string $title, string $msg, $activityId, $kecamatanId = null)
     {
-        $users = User::role($role)->get();
-        foreach ($users as $u) {
+        $users = User::role($role)->when($kecamatanId, fn($qq) => $qq->where('kecamatan_id', $kecamatanId))->get();
+        $superadmins = $kecamatanId ? User::role('superadmin')->get() : collect();
+        foreach ($users->merge($superadmins)->unique('id') as $u) {
             AppNotification::create(['user_id' => $u->id, 'title' => $title, 'message' => $msg, 'type' => 'verifikasi', 'activity_id' => $activityId]);
         }
     }

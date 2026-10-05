@@ -14,27 +14,38 @@ class ImportReportController extends Controller
     // --- Import ---
     public function showImport()
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
+        abort_unless(auth()->user()->hasAnyRole(['admin','superadmin']), 403);
         $logs = ImportLog::with('user')->latest()->paginate(10);
-        return view('import.index', compact('logs'));
+        $kecamatans = auth()->user()->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
+        return view('import.index', compact('logs', 'kecamatans'));
     }
 
     public function preview(Request $request)
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
+        abort_unless(auth()->user()->hasAnyRole(['admin','superadmin']), 403);
         $request->validate(['file' => 'required|file|mimes:xlsx,xls,csv|max:5120']);
         $rows = Excel::toCollection(new ActivitiesImport, $request->file('file'))[0]->take(10);
         $request->session()->put('import_file', $request->file('file')->store('imports'));
         $request->session()->put('import_name', $request->file('file')->getClientOriginalName());
+        $request->session()->put('import_kecamatan', $this->importKecamatanId($request));
         return view('import.preview', ['rows' => $rows]);
+    }
+
+    private function importKecamatanId(Request $request): ?int
+    {
+        $user = auth()->user();
+        if ($user->isSuperAdmin()) {
+            return $request->filled('kecamatan_id') ? (int) $request->kecamatan_id : null;
+        }
+        return $user->kecamatan_id;
     }
 
     public function process(Request $request)
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
+        abort_unless(auth()->user()->hasAnyRole(['admin','superadmin']), 403);
         $path = $request->session()->get('import_file');
         abort_if(!$path, 400, 'Tidak ada file untuk diproses. Upload ulang.');
-        $import = new ActivitiesImport;
+        $import = new ActivitiesImport($request->session()->get('import_kecamatan'));
         Excel::import($import, storage_path('app/'.$path));
         $total = count($import->errors) + $import->success;
         ImportLog::create([
@@ -53,7 +64,14 @@ class ImportReportController extends Controller
     // --- Laporan ---
     public function reports(Request $request)
     {
+        $user = auth()->user();
         $q = \App\Models\Activity::with('section');
+        if (!$user->isSuperAdmin() && $user->kecamatan_id) {
+            $q->where('activities.kecamatan_id', $user->kecamatan_id);
+        }
+        if ($user->isSuperAdmin() && $request->filled('kecamatan_id')) {
+            $q->where('activities.kecamatan_id', $request->kecamatan_id);
+        }
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
         if ($request->filled('status')) $q->where('status', $request->status);
         if ($request->filled('month')) $q->whereMonth('activity_date', $request->month);
@@ -80,17 +98,31 @@ class ImportReportController extends Controller
         $summary['sisa'] = $summary['pagu'] - $summary['realisasi'];
         $summary['pct'] = $summary['pagu'] > 0 ? round($summary['realisasi'] / $summary['pagu'] * 100, 1) : 0;
         $activities = $q->orderBy('activity_date')->paginate(20)->withQueryString();
-        return view('reports.index', compact('activities','sections','summary','perRekening'));
+        $kecamatans = $user->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
+        return view('reports.index', compact('activities','sections','summary','perRekening','kecamatans'));
+    }
+
+    /** Kecamatan untuk export: tenant user, atau pilihan superadmin. Mengembalikan ID atau null. */
+    private function exportKecamatanId(Request $request): ?int
+    {
+        $user = auth()->user();
+        if ($user->isSuperAdmin()) {
+            return $request->filled('kecamatan_id') ? (int) $request->kecamatan_id : null;
+        }
+        return $user->kecamatan_id;
     }
 
     public function exportExcel(Request $request)
     {
-        return Excel::download(new ActivitiesExport($request->only(['section_id','status','month','year'])), 'laporan-kegiatan.xlsx');
+        $filters = $request->only(['section_id','status','month','year']);
+        if ($kid = $this->exportKecamatanId($request)) $filters['kecamatan_id'] = $kid;
+        return Excel::download(new ActivitiesExport($filters), 'laporan-kegiatan.xlsx');
     }
 
     public function exportPdf(Request $request)
     {
         $q = \App\Models\Activity::with('section')->orderBy('activity_date');
+        if ($kid = $this->exportKecamatanId($request)) $q->where('activities.kecamatan_id', $kid);
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
         if ($request->filled('status')) $q->where('status', $request->status);
         $activities = $q->get();
@@ -118,6 +150,12 @@ class ImportReportController extends Controller
         if ($user->hasAnyRole(['kasi', 'staf']) && $user->section_id) {
             $q->where('section_id', $user->section_id);
         }
+        if (!$user->isSuperAdmin() && $user->kecamatan_id) {
+            $q->where('activities.kecamatan_id', $user->kecamatan_id);
+        }
+        if ($user->isSuperAdmin() && $request->filled('kecamatan_id')) {
+            $q->where('activities.kecamatan_id', $request->kecamatan_id);
+        }
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
         return $q;
     }
@@ -126,6 +164,7 @@ class ImportReportController extends Controller
     {
         $activities = $this->h7Query($request)->get();
         $sections = \App\Models\Section::active()->orderBy('order')->get();
+        $kecamatans = auth()->user()->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
         $waData = $activities->map(fn($a) => [
             'h' => $a->days_to_event,
             'tgl' => $a->activity_date->translatedFormat('d F Y'),
@@ -134,7 +173,7 @@ class ImportReportController extends Controller
             'butuh' => $a->requirement_qty.'/'.$a->total_qty.' '.$a->unit,
             'pj' => $a->pptk->name ?? '-',
         ])->values();
-        return view('reports.h7', compact('activities', 'sections', 'waData'));
+        return view('reports.h7', compact('activities', 'sections', 'waData', 'kecamatans'));
     }
 
     public function h7Excel(Request $request)
@@ -144,6 +183,7 @@ class ImportReportController extends Controller
         if ($user->hasAnyRole(['kasi', 'staf']) && $user->section_id) {
             $filters['section_id'] = $user->section_id;
         }
+        if ($kid = $this->exportKecamatanId($request)) $filters['kecamatan_id'] = $kid;
         return Excel::download(new ActivitiesExport(array_merge(
             $filters,
             ['from' => now()->toDateString(), 'to' => now()->addDays(7)->toDateString()]

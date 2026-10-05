@@ -65,6 +65,7 @@ class InstallerController extends Controller
                 'sections' => \App\Models\Section::count(),
                 'activities' => \App\Models\Activity::count(),
                 'users' => \App\Models\User::count(),
+                'kecamatan' => Schema::hasTable('kecamatans') ? \App\Models\Kecamatan::count() : 0,
             ];
         } catch (\Throwable $e) {
             return ['done' => false];
@@ -138,6 +139,10 @@ class InstallerController extends Controller
         $log = [];
         try {
             Artisan::call('migrate', ['--force' => true]);
+            $log[] = Artisan::output();
+            // Sinkronisasi multi-tenant: 31 kecamatan, backfill data lama, akun per kecamatan
+            Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\TenantSeeder', '--force' => true]);
+            $log[] = 'Tenant disinkronkan (31 kecamatan).';
             $log[] = Artisan::output();
             try {
                 Artisan::call('optimize:clear');

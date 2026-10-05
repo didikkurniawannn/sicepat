@@ -14,30 +14,34 @@
   <a href="/dashboard" class="font-bold text-lg">🏛️ {{ config('app.name') }} <span class="text-xs font-normal text-slate-300">SiCepatKeg · Percepatan Kinerja & Kegiatan</span></a>
   <div class="hidden md:flex gap-4 text-sm items-center">
     <a href="/dashboard" class="hover:text-yellow-300">Dashboard</a>
-    <a href="/pantau" target="_blank" title="Halaman pantauan publik (tanpa login)" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded hover:bg-yellow-300">📊 Pantau</a>
+    <a href="/pantau/{{ auth()->user()->kecamatan->slug ?? 'cangkuang' }}" target="_blank" title="Halaman pantauan publik (tanpa login)" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded hover:bg-yellow-300">📊 Pantau</a>
     <a href="/kegiatan" class="hover:text-yellow-300">Kegiatan</a>
     <a href="/kalender" class="hover:text-yellow-300">Kalender</a>
-    @role('admin')
+    @hasanyrole('admin|superadmin')
     <a href="/verifikasi" class="hover:text-yellow-300">Verifikasi</a>
-    @endrole
+    @endhasanyrole
     <a href="/laporan" class="hover:text-yellow-300">Laporan</a>
     <a href="/unit-kerja" class="hover:text-yellow-300">Unit Kerja</a>
-    @role('admin')
+    @hasanyrole('admin|superadmin')
     <a href="/import" class="hover:text-yellow-300">Import</a>
     <a href="/pengguna" class="hover:text-yellow-300">Pengguna</a>
+    @endhasanyrole
+    @role('superadmin')
+    <a href="/kecamatan" class="hover:text-yellow-300">Kecamatan</a>
     @endrole
     <a href="/notifikasi" class="hover:text-yellow-300">Notifikasi ({{ auth()->user()->unreadNotifications()->count() }})</a>
   </div>
   <div class="flex items-center gap-2 text-sm">
-    <span class="hidden sm:inline">{{ auth()->user()->name }} <span class="text-slate-300">({{ auth()->user()->getRoleNames()->first() }} · {{ auth()->user()->section->short_name ?? '-' }})</span></span>
+    <span class="hidden sm:inline">{{ auth()->user()->name }} <span class="text-slate-300">({{ auth()->user()->getRoleNames()->first() }} · {{ auth()->user()->kecamatan->name ?? 'Semua' }} · {{ auth()->user()->section->short_name ?? '-' }})</span></span>
     <form action="/logout" method="POST">@csrf<button class="bg-red-600 px-3 py-1 rounded">Keluar</button></form>
   </div>
 </nav>
 <div class="md:hidden bg-slate-800 text-white text-xs flex gap-3 px-4 py-2 overflow-x-auto">
-  <a href="/dashboard">Dashboard</a><a href="/pantau" target="_blank" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded">📊 Pantau</a><a href="/kegiatan">Kegiatan</a><a href="/kalender">Kalender</a>
-  @role('admin')<a href="/verifikasi">Verifikasi</a>@endrole
+  <a href="/dashboard">Dashboard</a><a href="/pantau/{{ auth()->user()->kecamatan->slug ?? 'cangkuang' }}" target="_blank" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded">📊 Pantau</a><a href="/kegiatan">Kegiatan</a><a href="/kalender">Kalender</a>
+  @hasanyrole('admin|superadmin')<a href="/verifikasi">Verifikasi</a>@endhasanyrole
   <a href="/laporan">Laporan</a><a href="/unit-kerja">Unit</a>
-  @role('admin')<a href="/import">Import</a><a href="/pengguna">User</a>@endrole
+  @hasanyrole('admin|superadmin')<a href="/import">Import</a><a href="/pengguna">User</a>@endhasanyrole
+  @role('superadmin')<a href="/kecamatan">Kecamatan</a>@endrole
   <a href="/notifikasi">Notifikasi</a>
 </div>
 <main class="max-w-7xl mx-auto p-4">

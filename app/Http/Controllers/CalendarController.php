@@ -21,6 +21,9 @@ class CalendarController extends Controller
         if ($user->hasAnyRole(['kasi','staf']) && $user->section_id) {
             $q->where('section_id', $user->section_id);
         }
+        if (!$user->isSuperAdmin() && $user->kecamatan_id) {
+            $q->where('activities.kecamatan_id', $user->kecamatan_id);
+        }
         if ($request->filled('section_id')) $q->where('section_id', $request->section_id);
         if ($request->filled('status')) $q->where('status', $request->status);
 

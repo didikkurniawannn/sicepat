@@ -15,6 +15,7 @@
     <div class="hidden md:flex items-center gap-6 text-sm">
       <a href="#beranda" class="hover:text-yellow-300">Beranda</a>
       <a href="#modul" class="hover:text-yellow-300">Modul</a>
+      <a href="#wilayah" class="hover:text-yellow-300">Wilayah</a>
       <a href="#fitur" class="hover:text-yellow-300">Fitur</a>
       <a href="/pantau" class="hover:text-yellow-300">Pantauan</a>
       <a href="/login" class="bg-yellow-400 text-slate-900 font-semibold px-4 py-1.5 rounded-lg hover:bg-yellow-300">Masuk Aplikasi</a>
@@ -24,6 +25,7 @@
   <div id="menuMobile" class="hidden md:hidden px-4 pb-4 flex flex-col gap-2 text-sm border-t border-slate-700">
     <a href="#beranda" class="py-1">Beranda</a>
     <a href="#modul" class="py-1">Modul</a>
+    <a href="#wilayah" class="py-1">Wilayah</a>
     <a href="#fitur" class="py-1">Fitur</a>
     <a href="/pantau" class="py-1">Pantauan</a>
     <a href="/login" class="bg-yellow-400 text-slate-900 font-semibold px-4 py-2 rounded-lg text-center">Masuk Aplikasi</a>
@@ -41,11 +43,10 @@
         <a href="/login" class="bg-yellow-400 text-slate-900 font-bold px-6 py-2.5 rounded-xl hover:bg-yellow-300">Masuk Aplikasi →</a>
         <a href="/pantau" class="border border-white/40 px-6 py-2.5 rounded-xl hover:bg-white/10">📊 Pantauan Publik</a>
       </div>
-      <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $totalKegiatan }}</p><p class="text-xs text-slate-300">Kegiatan</p></div>
-        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $unitAktif }}</p><p class="text-xs text-slate-300">Unit Kerja</p></div>
+      <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
+        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $totalKegiatan }}</p><p class="text-xs text-slate-300">Kegiatan Terpantau</p></div>
+        <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-yellow-300">{{ $kecamatans->count() }}</p><p class="text-xs text-slate-300">Kecamatan</p></div>
         <div class="bg-white/10 rounded-xl p-3"><p class="text-xl md:text-2xl font-extrabold text-red-300">{{ $h7 }}</p><p class="text-xs text-slate-300">H-7 ke Depan</p></div>
-        <div class="bg-white/10 rounded-xl p-3"><p class="text-lg md:text-xl font-extrabold text-green-300">Rp {{ number_format($pagu / 1000000, 0, ',', '.') }} jt</p><p class="text-xs text-slate-300">Total Pagu</p></div>
       </div>
     </div>
     <div class="hidden md:block">
@@ -94,6 +95,20 @@
       <p class="text-xs text-slate-500 mt-1 flex-1">Profil, program, dan keterbukaan informasi kecamatan.</p>
       <span class="mt-4 text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg text-center">SEGERA HADIR</span>
     </div>
+  </div>
+</section>
+
+<!-- WILAYAH -->
+<section id="wilayah" class="max-w-7xl mx-auto px-4 py-14">
+  <h2 class="text-2xl md:text-3xl font-extrabold text-center">Pantauan per Kecamatan</h2>
+  <p class="text-center text-slate-500 text-sm mt-1 mb-8">Pilih kecamatan untuk melihat kalender & pengingat kegiatan — tanpa login, tanpa data nominal.</p>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    @foreach($kecamatans as $k)
+    <a href="/pantau/{{ $k->slug }}" class="bg-white rounded-xl shadow p-4 hover:shadow-lg hover:-translate-y-0.5 transition text-center">
+      <p class="font-bold text-sm">🏘️ {{ $k->name }}</p>
+      <p class="text-xs text-blue-700 mt-1">Buka pantauan →</p>
+    </a>
+    @endforeach
   </div>
 </section>
 

@@ -27,18 +27,24 @@ class DatabaseSeeder extends Seeder
             Section::updateOrCreate(['code' => $s['code']], $s);
         }
 
-        foreach (['admin', 'kasi', 'staf'] as $r) {
+        foreach (['admin', 'kasi', 'staf', 'superadmin'] as $r) {
             Role::findOrCreate($r);
         }
+
+        // Data demo menjadi milik kecamatan perintis (Cangkuang)
+        $cangkuang = \App\Models\Kecamatan::firstOrCreate(['code' => 'CKU'], [
+            'name' => 'Kecamatan Cangkuang', 'slug' => 'cangkuang', 'order' => 5,
+        ]);
 
         $secByName = Section::all()->keyBy('name');
         $secByCode = Section::all()->keyBy('code');
 
-        $mkUser = function (string $name, string $email, string $role, ?string $secCode) use ($secByCode) {
+        $mkUser = function (string $name, string $email, string $role, ?string $secCode) use ($secByCode, $cangkuang) {
             $u = User::updateOrCreate(['email' => $email], [
                 'name' => $name,
                 'password' => Hash::make('password123'),
                 'section_id' => $secCode ? $secByCode[$secCode]->id : $secByCode['SBU']->id,
+                'kecamatan_id' => $cangkuang->id,
             ]);
             $u->syncRoles([$role]);
             return $u;
@@ -90,6 +96,7 @@ class DatabaseSeeder extends Seeder
                 ]);
             $act->fill([
                     'section_id' => $section->id,
+                    'kecamatan_id' => $cangkuang->id,
                     'program_name' => $row['program_name'],
                     'requirement_qty' => $row['requirement_qty'],
                     'total_qty' => $row['total_qty'],

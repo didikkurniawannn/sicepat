@@ -28,6 +28,7 @@ class ActivitiesExport implements FromCollection, WithHeadings, WithEvents
         if (!empty($this->filters['year'])) $q->whereYear('activity_date', $this->filters['year']);
         if (!empty($this->filters['from'])) $q->where('activity_date', '>=', $this->filters['from']);
         if (!empty($this->filters['to'])) $q->where('activity_date', '<=', $this->filters['to']);
+        if (!empty($this->filters['kecamatan_id'])) $q->where('activities.kecamatan_id', $this->filters['kecamatan_id']);
         return $q->get()->map(fn($a) => [
             'Bulan' => $a->activity_date->format('Y-m-d'),
             'Bidang' => $a->section->name,

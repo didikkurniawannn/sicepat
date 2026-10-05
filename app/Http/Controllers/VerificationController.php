@@ -13,17 +13,23 @@ class VerificationController extends Controller
 {
     public function index()
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
-        $queue = Activity::with(['section','pptk'])->whereIn('status', ['diajukan','diverifikasi'])->orderBy('activity_date')->paginate(15);
-        $history = Verification::with(['activity.section','user'])->latest()->paginate(15);
+        $user = auth()->user();
+        abort_unless($user->hasAnyRole(['admin','superadmin']), 403);
+        $queue = Activity::with(['section','pptk'])->whereIn('status', ['diajukan','diverifikasi'])
+            ->when(!$user->isSuperAdmin() && $user->kecamatan_id, fn($qq) => $qq->where('activities.kecamatan_id', $user->kecamatan_id))
+            ->orderBy('activity_date')->paginate(15);
+        $history = Verification::with(['activity.section','user'])
+            ->when(!$user->isSuperAdmin() && $user->kecamatan_id, fn($qq) => $qq->whereHas('activity', fn($aa) => $aa->where('kecamatan_id', $user->kecamatan_id)))
+            ->latest()->paginate(15);
         return view('verifications.index', compact('queue','history'));
     }
 
     public function decide(Request $request, Activity $activity)
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
-        $request->validate(['decision' => 'required|in:diverifikasi,disetujui,ditolak,revisi', 'note' => 'nullable|string']);
         $user = auth()->user();
+        abort_unless($user->hasAnyRole(['admin','superadmin']), 403);
+        abort_unless($user->isSuperAdmin() || ((int) $activity->kecamatan_id === (int) $user->kecamatan_id), 403, 'Data kecamatan lain.');
+        $request->validate(['decision' => 'required|in:diverifikasi,disetujui,ditolak,revisi', 'note' => 'nullable|string']);
 
         // Verifikator -> diverifikasi/ditolak/revisi ; Pimpinan/Admin -> disetujui
         $map = ['diverifikasi' => 'diverifikasi', 'disetujui' => 'disetujui', 'ditolak' => 'ditolak', 'revisi' => 'draft'];

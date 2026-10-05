@@ -31,24 +31,37 @@ class SectionUserController extends Controller
         return view('sections.show', compact('section','activities','stats'));
     }
 
-    public function users()
+    public function users(Request $request)
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
-        $users = \App\Models\User::with('section')->paginate(15);
-        return view('users.index', compact('users'));
+        $me = auth()->user();
+        abort_unless($me->hasAnyRole(['admin','superadmin']), 403);
+        $q = \App\Models\User::with(['section','kecamatan'])->orderBy('name');
+        if (!$me->isSuperAdmin() && $me->kecamatan_id) {
+            $q->where('kecamatan_id', $me->kecamatan_id);
+        }
+        if ($me->isSuperAdmin() && $request->filled('kecamatan_id')) {
+            $q->where('kecamatan_id', $request->kecamatan_id);
+        }
+        $users = $q->paginate(15)->withQueryString();
+        $kecamatans = $me->isSuperAdmin() ? \App\Models\Kecamatan::active()->orderBy('order')->get() : null;
+        return view('users.index', compact('users', 'kecamatans'));
     }
 
     public function usersStore(Request $request)
     {
-        abort_unless(auth()->user()->hasRole('admin'), 403);
+        $me = auth()->user();
+        abort_unless($me->hasAnyRole(['admin','superadmin']), 403);
         $data = $request->validate([
             'name' => 'required|string|max:255', 'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8', 'role' => 'required|in:admin,kasi,staf',
+            'password' => 'required|min:8', 'role' => 'required|in:admin,kasi,staf,superadmin',
             'section_id' => 'required|exists:sections,id',
+            'kecamatan_id' => 'nullable|exists:kecamatans,id',
         ]);
+        abort_if($data['role'] === 'superadmin' && !$me->isSuperAdmin(), 403, 'Hanya superadmin.');
         $u = \App\Models\User::create([
             'name' => $data['name'], 'email' => $data['email'],
             'password' => bcrypt($data['password']), 'section_id' => $data['section_id'],
+            'kecamatan_id' => $me->isSuperAdmin() ? ($data['kecamatan_id'] ?? null) : $me->kecamatan_id,
         ]);
         $u->syncRoles([$data['role']]);
         return back()->with('success', 'User dibuat.');

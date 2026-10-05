@@ -6,6 +6,9 @@
 @csrf @if($activity->exists)@method('PUT')@endif
   <div><label>Tanggal Pelaksanaan *</label><input type="date" name="activity_date" value="{{ old('activity_date', $activity->activity_date?->format('Y-m-d')) }}" required class="w-full border rounded px-2 py-1"></div>
   <div><label>Bidang / Unit Kerja *</label><select name="section_id" required class="w-full border rounded px-2 py-1">@foreach($sections as $s)<option value="{{ $s->id }}" @selected(old('section_id',$activity->section_id)==$s->id)>{{ $s->name }}</option>@endforeach</select></div>
+  @if(!empty($kecamatans))
+  <div><label>Kecamatan *</label><select name="kecamatan_id" required class="w-full border rounded px-2 py-1">@foreach($kecamatans as $k)<option value="{{ $k->id }}" @selected(old('kecamatan_id',$activity->kecamatan_id)==$k->id)>{{ $k->name }}</option>@endforeach</select></div>
+  @endif
   <div><label>Kode Rekening *</label><input name="account_code" value="{{ old('account_code',$activity->account_code) }}" required class="w-full border rounded px-2 py-1" placeholder="7.01.02.2.04.0003"></div>
   <div><label>Penanggung Jawab (Kasi)</label><select name="pptk_id" class="w-full border rounded px-2 py-1"><option value="">—</option>@foreach($pptks as $p)<option value="{{ $p->id }}" @selected(old('pptk_id',$activity->pptk_id)==$p->id)>{{ $p->name }} ({{ $p->section->short_name ?? '-' }})</option>@endforeach</select></div>
   <div class="md:col-span-2"><label>Nama Program/Kegiatan *</label><textarea name="program_name" required class="w-full border rounded px-2 py-1">{{ old('program_name',$activity->program_name) }}</textarea></div>
