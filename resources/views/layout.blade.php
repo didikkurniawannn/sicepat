@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@yield('title','Dashboard') — SiCepatKeg</title>
+<title>@yield('title','Dashboard') — {{ config('app.name') }}</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
@@ -11,7 +11,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 <nav class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-  <a href="/dashboard" class="font-bold text-lg">⚡ SiCepatKeg <span class="text-xs font-normal text-slate-300">Percepatan Kinerja & Kegiatan</span></a>
+  <a href="/dashboard" class="font-bold text-lg">🏛️ {{ config('app.name') }} <span class="text-xs font-normal text-slate-300">SiCepatKeg · Percepatan Kinerja & Kegiatan</span></a>
   <div class="hidden md:flex gap-4 text-sm items-center">
     <a href="/dashboard" class="hover:text-yellow-300">Dashboard</a>
     <a href="/pantau" target="_blank" title="Halaman pantauan publik (tanpa login)" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded hover:bg-yellow-300">📊 Pantau</a>
@@ -45,7 +45,7 @@
   @if($errors->any())<div class="bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded mb-4"><ul class="list-disc ml-5">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
   @yield('content')
 </main>
-<footer class="text-center text-xs text-slate-500 py-6">© 2026 SiCepatKeg — Sistem Informasi Percepatan Kinerja & Kegiatan Instansi</footer>
+<footer class="text-center text-xs text-slate-500 py-6">© 2026 {{ config('app.name') }} — Modul SiCepatKeg · Percepatan Kinerja & Kegiatan Instansi</footer>
 @yield('scripts')
 </body>
 </html>

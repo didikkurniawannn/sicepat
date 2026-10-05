@@ -2,5 +2,5 @@
 <body><h2>🔔 Pengingat H-7 — Rencana {{ now()->translatedFormat('d F Y') }} s.d. {{ now()->addDays(7)->translatedFormat('d F Y') }}</h2>
 <table><thead><tr><th>No</th><th>Tanggal</th><th>Sisa Hari</th><th>Kegiatan</th><th>Bidang</th><th>Kebutuhan</th><th>Lokasi</th><th>Penanggung Jawab</th><th>Status</th></tr></thead>
 <tbody>@forelse($activities as $a)<tr><td>{{ $loop->iteration }}</td><td>{{ $a->activity_date->translatedFormat('l, d F Y') }}</td><td><span class="h">H-{{ $a->days_to_event }}</span></td><td>{{ $a->title }}<br><small>{{ $a->account_code }}</small></td><td>{{ $a->section->short_name }}</td><td>{{ $a->requirement_qty }} / {{ $a->total_qty }} {{ $a->unit }}</td><td>{{ $a->location ?? '-' }}</td><td>{{ $a->pptk->name ?? '-' }}</td><td>{{ $a->status }}</td></tr>@empty<tr><td colspan="9">Tidak ada kegiatan dalam 7 hari ke depan.</td></tr>@endforelse</tbody></table>
-<p><small>Dicetak dari SiCepatKeg pada {{ now()->translatedFormat('d F Y H:i') }} WIB — mohon persiapan dokumen, anggaran, SDM & jadwal.</small></p>
+<p><small>Dicetak dari {{ config('app.name') }} pada {{ now()->translatedFormat('d F Y H:i') }} WIB — mohon persiapan dokumen, anggaran, SDM & jadwal.</small></p>
 </body></html>

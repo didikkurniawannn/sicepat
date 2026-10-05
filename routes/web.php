@@ -6,12 +6,13 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportReportController;
 use App\Http\Controllers\InstallerController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicMonitorController;
 use App\Http\Controllers\SectionUserController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => redirect('/dashboard'));
+Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/pantau', [PublicMonitorController::class, 'index'])->name('pantau');
 Route::get('/api/pantau/events', [PublicMonitorController::class, 'events']);
 

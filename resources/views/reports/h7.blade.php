@@ -54,7 +54,7 @@
 <script>
 const dataH7 = @json($waData);
 function teksWA(){
-  let t = '🔔 *PENGINGAT H-7 SiCepatKeg*\nPeriode {{ now()->translatedFormat('d F Y') }} s.d. {{ now()->addDays(7)->translatedFormat('d F Y') }}\n\n';
+  let t = '🔔 *PENGINGAT H-7 {{ config('app.name') }}*\nPeriode {{ now()->translatedFormat('d F Y') }} s.d. {{ now()->addDays(7)->translatedFormat('d F Y') }}\n\n';
   if (dataH7.length === 0) t += 'Tidak ada kegiatan dalam 7 hari ke depan. 🎉';
   dataH7.forEach((a, i) => {
     t += `${i+1}. *H-${a.h}* · ${a.tgl}\n   ${a.judul} [${a.unit}]\n   Kebutuhan: ${a.butuh} · PJ: ${a.pj}\n\n`;

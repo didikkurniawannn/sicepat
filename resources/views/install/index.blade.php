@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Instalasi — SiCepatKeg</title><script src="https://cdn.tailwindcss.com"></script></head>
+<title>Instalasi — {{ config('app.name', 'Super Apps Kecamatan') }}</title><script src="https://cdn.tailwindcss.com"></script></head>
 <body class="bg-slate-900 min-h-screen flex items-start justify-center p-4 py-10">
 <div class="bg-white rounded-xl shadow-xl p-6 md:p-8 w-full max-w-2xl">
-  <h1 class="text-2xl font-bold">⚡ Instalasi SiCepatKeg</h1>
+  <h1 class="text-2xl font-bold">🏛️ Instalasi {{ config('app.name', 'Super Apps Kecamatan') }}</h1>
   <p class="text-sm text-slate-500 mb-4">Link instalasi data & aplikasi (migrasi database + seed 58 kegiatan dari Data Kegiatan.xlsx + akun demo).</p>
 
   @if(!empty($installed['done']))

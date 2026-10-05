@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pantauan Kegiatan — SiCepatKeg</title>
+<title>Pantauan Kegiatan — {{ config('app.name') }}</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -18,7 +18,7 @@
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 <header class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
   <div>
-    <span class="font-bold text-lg">⚡ SiCepatKeg</span>
+    <span class="font-bold text-lg">🏛️ {{ config('app.name') }}</span>
     <span class="text-xs text-slate-300 ml-2">Pantauan Kegiatan — tanpa login · data per {{ now()->translatedFormat('d F Y H:i') }} WIB · refresh otomatis 5 menit</span>
   </div>
   <a href="/login" class="bg-yellow-400 text-slate-900 text-sm font-semibold px-3 py-1 rounded">Login Petugas</a>
@@ -93,7 +93,7 @@
   </div>
 </div>
 
-<footer class="text-center text-xs text-slate-500 py-6">© 2026 SiCepatKeg — Halaman pantauan publik, dapat diakses tanpa login</footer>
+<footer class="text-center text-xs text-slate-500 py-6">© 2026 {{ config('app.name') }} — Halaman pantauan publik, dapat diakses tanpa login</footer>
 
 <script>
 const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');

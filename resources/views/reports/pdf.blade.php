@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:4px}th{background:#eee}</style></head>
-<body><h2>Laporan Kegiatan — SiCepatKeg</h2>
+<body><h2>Laporan Kegiatan — {{ config('app.name') }}</h2>
 @if(!empty($dupColors))
 <p style="font-size:11px">Keterangan: baris berwarna = kode rekening yang sama muncul &gt; 1x.
 @foreach($dupColors as $code => $color)<span style="background-color:{{ $color }};padding:1px 6px;border:1px solid #999">{{ $code }}</span> @endforeach</p>
