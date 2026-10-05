@@ -25,6 +25,9 @@ class User extends Authenticatable
     public function section(): BelongsTo { return $this->belongsTo(Section::class); }
     public function kecamatan(): BelongsTo { return $this->belongsTo(Kecamatan::class); }
     public function isSuperAdmin(): bool { return $this->hasRole('superadmin'); }
+
+    /** Hak tulis modul Data Sektoral: superadmin + admin/operator tenant. */
+    public function canWrite(): bool { return $this->isSuperAdmin() || $this->hasAnyRole(['admin', 'operator']); }
     public function pptkActivities() { return $this->hasMany(Activity::class, 'pptk_id'); }
     public function notifications() { return $this->hasMany(AppNotification::class)->latest(); }
     public function unreadNotifications() { return $this->hasMany(AppNotification::class)->whereNull('read_at'); }

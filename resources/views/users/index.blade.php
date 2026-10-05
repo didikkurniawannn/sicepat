@@ -8,7 +8,7 @@
 <input name="name" required placeholder="Nama" class="border rounded px-2 py-1">
 <input name="email" type="email" required placeholder="Email" class="border rounded px-2 py-1">
 <input name="password" required placeholder="Password min 8" class="border rounded px-2 py-1">
-<select name="role" class="border rounded px-2 py-1"><option value="kasi">kasi (merangkap PPTK)</option><option value="staf">staf</option><option value="admin">admin (verifikasi + pimpinan)</option>@if(auth()->user()->isSuperAdmin())<option value="superadmin">superadmin</option>@endif</select>
+<select name="role" class="border rounded px-2 py-1"><option value="kasi">kasi (merangkap PPTK)</option><option value="staf">staf</option><option value="admin">admin (verifikasi + pimpinan)</option>@if(auth()->user()->isSuperAdmin())<option value="superadmin">superadmin</option><option value="operator">operator sektoral</option><option value="pimpinan">pimpinan (baca)</option><option value="viewer">viewer (baca)</option>@endif</select>
 <select name="section_id" class="border rounded px-2 py-1">@foreach(\App\Models\Section::active()->orderBy('order')->get() as $s)<option value="{{ $s->id }}">{{ $s->name }}</option>@endforeach</select>
 @if(!empty($kecamatans))
 <select name="kecamatan_id" class="border rounded px-2 py-1">@foreach($kecamatans as $k)<option value="{{ $k->id }}">{{ $k->name }}</option>@endforeach</select>

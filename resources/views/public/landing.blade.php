@@ -89,11 +89,14 @@
       <p class="text-xs text-slate-500 mt-1 flex-1">Saluran aspirasi & pengaduan warga terpadu.</p>
       <span class="mt-4 text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg text-center">SEGERA HADIR</span>
     </div>
-    <div class="bg-white rounded-2xl shadow p-6 border-t-4 border-slate-300 opacity-80 flex flex-col">
-      <p class="text-3xl">📊</p>
-      <h3 class="font-bold mt-2">Data & Informasi</h3>
-      <p class="text-xs text-slate-500 mt-1 flex-1">Profil, program, dan keterbukaan informasi kecamatan.</p>
-      <span class="mt-4 text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg text-center">SEGERA HADIR</span>
+    <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-emerald-600 flex flex-col">
+      <p class="text-3xl">🗺️</p>
+      <h3 class="font-bold mt-2">Data Sektoral</h3>
+      <p class="text-xs text-slate-500 mt-1 flex-1">Peta GIS, fasilitas per modul, kependudukan & indikator, komparasi 31 kecamatan, dan rekomendasi AI.</p>
+      <div class="mt-4 flex gap-2 text-sm">
+        <a href="/sektoral" class="flex-1 text-center bg-emerald-600 text-white px-3 py-1.5 rounded-lg">Peta GIS</a>
+        <a href="/sektoral/dashboard" class="flex-1 text-center bg-slate-900 text-white px-3 py-1.5 rounded-lg">Dashboard</a>
+      </div>
     </div>
   </div>
 </section>

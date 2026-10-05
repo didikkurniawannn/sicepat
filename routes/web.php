@@ -9,6 +9,7 @@ use App\Http\Controllers\InstallerController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicMonitorController;
 use App\Http\Controllers\SectionUserController;
+use App\Http\Controllers\Sektoral;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
@@ -25,8 +26,30 @@ Route::get('/install', [InstallerController::class, 'index']);
 Route::post('/install', [InstallerController::class, 'run']);
 Route::post('/install/migrate', [InstallerController::class, 'migrateUp']);
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
-Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::post('/login', [AuthController::class, 'login'])->middleware(['guest', 'throttle:10,1']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+// Modul Data Sektoral (GIS, fasilitas, komparasi, AI) — frontend global 31 kecamatan
+Route::get('/sektoral', [Sektoral\HomeController::class, 'index'])->name('sektoral.home');
+Route::prefix('sektoral')->middleware(['auth', 'tenant'])->group(function () {
+    Route::get('/dashboard', [Sektoral\DashboardController::class, 'index'])->name('sektoral.dashboard');
+    Route::resource('facilities', Sektoral\FacilityController::class);
+    Route::resource('data-entries', Sektoral\DataEntryController::class)->except(['show']);
+    Route::resource('kecamatans', Sektoral\KecamatanController::class)->except(['destroy']);
+    Route::post('kecamatans/{kecamatan}/toggle', [Sektoral\KecamatanController::class, 'toggle'])->name('kecamatans.toggle');
+    Route::post('kecamatans/{kecamatan}/villages', [Sektoral\VillageController::class, 'store'])->name('villages.store');
+    Route::delete('villages/{village}', [Sektoral\VillageController::class, 'destroy'])->name('villages.destroy');
+    Route::get('import/fasilitas', [Sektoral\ImportController::class, 'facilityForm'])->name('import.facilities');
+    Route::post('import/fasilitas', [Sektoral\ImportController::class, 'facilityStore'])->name('import.facilities.store');
+    Route::get('import/fasilitas/template', [Sektoral\ImportController::class, 'facilityTemplate'])->name('import.facilities.template');
+    Route::get('import/data-sektoral', [Sektoral\ImportController::class, 'entryForm'])->name('import.entries');
+    Route::post('import/data-sektoral', [Sektoral\ImportController::class, 'entryStore'])->name('import.entries.store');
+    Route::get('import/data-sektoral/template', [Sektoral\ImportController::class, 'entryTemplate'])->name('import.entries.template');
+    Route::get('komparasi', [Sektoral\ComparisonController::class, 'index'])->name('komparasi');
+    Route::get('gis', [Sektoral\GisController::class, 'index'])->name('gis.index');
+    Route::resource('ai', Sektoral\AiRecommendationController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::get('audit', [Sektoral\AuditLogController::class, 'index'])->name('audit.index');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -64,8 +87,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/unit-kerja', [SectionUserController::class, 'sections']);
     Route::get('/unit-kerja/{section}', [SectionUserController::class, 'sectionShow']);
 
-    Route::get('/pengguna', [SectionUserController::class, 'users']);
-    Route::post('/pengguna', [SectionUserController::class, 'usersStore']);
+    Route::get('/pengguna', [SectionUserController::class, 'users'])->name('pengguna.index');
+    Route::post('/pengguna', [SectionUserController::class, 'usersStore'])->name('pengguna.store');
 
     Route::get('/kecamatan', [TenantController::class, 'index']);
     Route::post('/kecamatan', [TenantController::class, 'store']);

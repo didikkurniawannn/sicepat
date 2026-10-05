@@ -143,6 +143,9 @@ class InstallerController extends Controller
             // Sinkronisasi multi-tenant: 31 kecamatan, backfill data lama, akun per kecamatan
             Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\TenantSeeder', '--force' => true]);
             $log[] = 'Tenant disinkronkan (31 kecamatan).';
+            // Modul Data Sektoral: profil wilayah, 279 desa, indikator, sampel
+            Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\SektoralSeeder', '--force' => true]);
+            $log[] = 'Data Sektoral disinkronkan (profil, desa, indikator).';
             $log[] = Artisan::output();
             try {
                 Artisan::call('optimize:clear');

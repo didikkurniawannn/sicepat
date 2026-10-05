@@ -21,6 +21,7 @@
     <a href="/verifikasi" class="hover:text-yellow-300">Verifikasi</a>
     @endhasanyrole
     <a href="/laporan" class="hover:text-yellow-300">Laporan</a>
+    <a href="/sektoral/dashboard" class="hover:text-yellow-300">Sektoral</a>
     <a href="/unit-kerja" class="hover:text-yellow-300">Unit Kerja</a>
     @hasanyrole('admin|superadmin')
     <a href="/import" class="hover:text-yellow-300">Import</a>
@@ -39,7 +40,7 @@
 <div class="md:hidden bg-slate-800 text-white text-xs flex gap-3 px-4 py-2 overflow-x-auto">
   <a href="/dashboard">Dashboard</a><a href="/pantau/{{ auth()->user()->kecamatan->slug ?? 'cangkuang' }}" target="_blank" class="font-bold bg-yellow-400 text-slate-900 px-2 py-0.5 rounded">📊 Pantau</a><a href="/kegiatan">Kegiatan</a><a href="/kalender">Kalender</a>
   @hasanyrole('admin|superadmin')<a href="/verifikasi">Verifikasi</a>@endhasanyrole
-  <a href="/laporan">Laporan</a><a href="/unit-kerja">Unit</a>
+  <a href="/laporan">Laporan</a><a href="/sektoral/dashboard">Sektoral</a><a href="/unit-kerja">Unit</a>
   @hasanyrole('admin|superadmin')<a href="/import">Import</a><a href="/pengguna">User</a>@endhasanyrole
   @role('superadmin')<a href="/kecamatan">Kecamatan</a>@endrole
   <a href="/notifikasi">Notifikasi</a>

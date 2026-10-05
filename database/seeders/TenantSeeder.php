@@ -37,7 +37,7 @@ class TenantSeeder extends Seeder
 
     public function run(): void
     {
-        foreach (['admin', 'kasi', 'staf', 'superadmin'] as $r) {
+        foreach (['admin', 'kasi', 'staf', 'superadmin', 'operator', 'pimpinan', 'viewer'] as $r) {
             Role::findOrCreate($r);
         }
 
@@ -72,6 +72,13 @@ class TenantSeeder extends Seeder
                 'kecamatan_id' => $kec->id,
             ]);
             $u->syncRoles(['admin']);
+        }
+
+        // Admin tenant sekaligus operator Data Sektoral di wilayahnya
+        foreach (User::role('admin')->whereNotNull('kecamatan_id')->get() as $admin) {
+            if (!$admin->hasRole('operator')) {
+                $admin->assignRole('operator');
+            }
         }
     }
 }

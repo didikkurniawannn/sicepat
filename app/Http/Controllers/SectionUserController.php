@@ -53,7 +53,7 @@ class SectionUserController extends Controller
         abort_unless($me->hasAnyRole(['admin','superadmin']), 403);
         $data = $request->validate([
             'name' => 'required|string|max:255', 'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8', 'role' => 'required|in:admin,kasi,staf,superadmin',
+            'password' => 'required|min:8', 'role' => 'required|in:admin,kasi,staf,superadmin,operator,pimpinan,viewer',
             'section_id' => 'required|exists:sections,id',
             'kecamatan_id' => 'nullable|exists:kecamatans,id',
         ]);
